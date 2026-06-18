@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project - 1140511 黃盼盼</title>
+    <style>
+        /* ================= 極簡學術風全域排版 ================= */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #eef2f5; 
+            margin: 0; 
+            padding: 20px; 
+            color: #333; 
+        }
+        
+        .main-title { 
+            font-family: 'Times New Roman', Times, serif; /* 老師範例的襯線字體 */
+            font-size: 2.5em;
+            color: #666; 
+            font-weight: normal;
+            border-bottom: 1px solid #ccc; 
+            padding-bottom: 5px; 
+            margin-top: 0; 
+            margin-bottom: 10px;
+            display: flex; 
+            align-items: baseline; 
+            gap: 15px;
+        }
+        .main-title span { 
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.35em; 
+            color: #888;
+            font-weight: bold;
+        }
+
+        /* 視窗標題列風格 */
+        .header { 
+            background-color: #6c757d; 
+            color: white; 
+            padding: 8px 15px; 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            border-top-left-radius: 4px; 
+            border-top-right-radius: 4px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        /* 視窗控制按鈕 */
+        .window-controls { letter-spacing: 5px; font-family: monospace; font-size: 1.2em; opacity: 0.8;}
+
+        .container { 
+            display: flex; 
+            gap: 10px; 
+            background-color: white; 
+            padding: 10px; 
+            border-bottom-left-radius: 4px; 
+            border-bottom-right-radius: 4px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            min-height: 80vh; 
+        }
+        
+        /* ================= 三大區塊三色邊框設計 ================= */
+        .col { padding: 12px; background-color: #fcfcfc; }
+        
+        /* 左欄：紅色系 */
+        .col-1 { flex: 1; min-width: 280px; border: 2px solid #d9534f; border-radius: 2px; }
+        .col-1 .section-title { color: #d9534f; }
+        
+        /* 中欄：藍色系 */
+        .col-2 { flex: 1.2; min-width: 320px; border: 2px solid #5bc0de; border-radius: 2px; display: flex; flex-direction: column; gap: 10px; }
+        .col-2 .section-title { color: #5bc0de; }
+        .col-2 .box { border: 1px solid #5bc0de; }
+
+        /* 右欄：綠色系 */
+        .col-3 { flex: 2.2; min-width: 450px; border: 2px solid #5cb85c; border-radius: 2px; display: flex; flex-direction: column;}
+        .col-3 .section-title { color: #5cb85c; }
+        
+        /* ================= 內部區塊與表格 ================= */
+        .section-title { font-size: 0.9em; font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; }
+        .box { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; background-color: white; border-radius: 2px; }
+        
+        table.data-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85em; table-layout: fixed; background: white;}
+        table.data-table th, table.data-table td { border: 1px solid #ddd; padding: 6px; color: #333; }
+        table.data-table th { background-color: #f9f9f9; color: #555; }
+        
+        .editable-cell { cursor: text; transition: all 0.2s; outline: none; color: #333;}
+        .editable-cell:hover { background-color: #f0f0f0; }
+        .editable-cell:focus { background-color: #e8f4f8; box-shadow: inset 0 0 0 1px #5bc0de; }
+        
+        /* 輸入框更緊湊 */
+        .var-input { width: 80%; padding: 4px; border: 1px solid #ccc; border-radius: 2px; font-weight: bold; text-align: center; color: #333; font-size: 0.9em;}
+        
+        /* ================= 按鈕與選項 ================= */
+        .radio-group { margin-bottom: 4px; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 10px; color: #555; }
+        .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
+        button.action-btn { flex: 1; padding: 6px 10px; border: 1px solid #ccc; background-color: #f9f9f9; cursor: pointer; border-radius: 2px; font-size: 0.85em; color: #555; transition: 0.2s; }
+        button.action-btn:hover { background-color: #e9ecef; color: #000; }
+
+        /* ================= 卡諾圖 (K-Map) ================= */
+        .kmap-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; }
+        .kmap-tabs button { padding: 4px 12px; border: 1px solid #5bc0de; background: #fff; color: #5bc0de; font-size: 0.8em; border-radius: 2px; cursor: pointer;}
+        .kmap-tabs button.active { background: #5bc0de; color: white; border-color: #46b8da;}
+        .kmap-container { margin: 5px auto; display: flex; justify-content: center; align-items: center; min-height: 100px;}
+        .kmap-table { border-collapse: collapse; text-align: center; font-size: 13px; background: white; margin: 0 auto; }
+        .kmap-table td { padding: 2px 6px; border: none; color: #555;}
+        .kmap-table .kmap-cell { border: 1px solid #555 !important; width: 35px; height: 35px; font-weight: normal; color: #000;}
+        
+        /* ================= 電路圖區域 ================= */
+        .diagram-area { flex: 1; width: 100%; min-height: 500px; background-color: #fff; position: relative; overflow: hidden; border: 1px solid #eee;}
+        .var-text { font-weight: bold; color: #333; }
+
+        /* 訊號線流動特效保持，但顏色改為較素雅的灰黑色系 */
+        .animated-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: flow 0.6s linear infinite; }
+        @keyframes flow { from { stroke-dashoffset: 10; } to { stroke-dashoffset: 0; } }
+        
+        .animated-gate { animation: popIn 0.3s ease-out forwards; opacity: 0; transform-origin: center; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        .highlight-lbl { font-family: monospace; font-size: 11px; fill: #555; background: white;}
+        
+        /* 同步提示 */
+        .sync-flash { animation: flashGrey 0.4s ease-out; }
+        @keyframes flashGrey { 0% { background-color: #ddd; } 100% { background-color: transparent; } }
+
+        /* 腳註資訊 */
+        .footer-note { font-size: 0.75em; color: #888; margin-top: 10px; padding-left: 15px;}
+        .footer-note li { margin-bottom: 3px; }
+    </style>
+</head>
+<body>
+
+<div style="max-width: 1300px; margin: 0 auto;">
+    <h1 class="main-title">
+        Final Project 
+        <span>1140511 黃盼盼</span>
+    </h1>
+    
+    <div class="header">
+        <span>⚙ Sequential Circuit Design Automation System</span>
+        <div class="window-controls">- □ x</div>
+    </div>
+
+    <div class="container">
+        <div class="col col-1">
+            <div class="box" style="border:none; padding:0; margin-bottom:15px; background:transparent;">
+                <div class="section-title">1. MODEL TYPE</div>
+                <div class="radio-group" style="margin-bottom: 15px;">
+                    <label><input type="radio" name="model" value="mealy" checked onchange="triggerUpdate()"> Mealy Model</label>
+                    <label><input type="radio" name="model" value="moore" onchange="triggerUpdate()"> Moore Model</label>
+                </div>
+
+                <div class="section-title">2. FLIP-FLOP TYPE</div>
+                <div class="radio-group" style="margin-bottom: 15px;">
+                    <label><input type="radio" name="ff_type" value="jk" checked onchange="triggerUpdate()"> JK Flip-Flop</label>
+                    <label><input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR Flip-Flop</label>
+                    <label><input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D Flip-Flop</label>
+                    <label><input type="radio" name="ff_type" value="t" onchange="triggerUpdate()"> T Flip-Flop</label>
+                </div>
+
+                <div class="section-title">3. TABLE SIZE</div>
+                <div class="radio-group" style="margin-bottom: 15px;">
+                    <label><input type="radio" name="row_count" value="4" onchange="updateRowCount()"> 4 Rows</label>
+                    <label><input type="radio" name="row_count" value="6" checked onchange="updateRowCount()"> 6 Rows</label>
+                    <label><input type="radio" name="row_count" value="8" onchange="updateRowCount()"> 8 Rows</label>
+                </div>
+            </div>
+
+            <div class="box" style="border:none; padding:0; background:transparent;">
+                <div class="section-title">4. STATE TABLE INPUT</div>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex:1;"><label style="font-size: 0.8em;">Input Variables</label><br><input type="text" id="input-var" class="var-input" value="X" maxlength="1" oninput="triggerUpdate()"></div>
+                    <div style="flex:1;"><label style="font-size: 0.8em;">Output Variation</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1" oninput="triggerUpdate()"></div>
+                </div>
+                
+                <div style="font-size: 0.8em; color: #5bc0de; font-weight: bold; margin-bottom: 5px;">
+                    Assign: <span id="state-assign-lbl" style="color: #555;">...</span>
+                </div>
+                
+                <label style="font-size: 0.8em; font-weight:bold;">State Table</label>
+                <table class="data-table" id="state-table" style="margin-top: 5px;">
+                    <thead><tr><th>Present State</th><th><span class="dyn-in">X</span></th><th>Next State</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div class="btn-group">
+                    <button class="action-btn" onclick="clearTable()">Clear Table</button>
+                    <button class="action-btn" onclick="loadExample()">Load Example</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col col-2">
+            <div class="box" style="margin-bottom: 0;">
+                <div class="section-title">OUTPUT 1: FLIP-FLOP INPUT EQUATIONS</div>
+                <p style="font-size: 0.8em; text-align: center; margin: 5px 0;">Flip-Flop Input Equations (Simplified)</p>
+                <p style="font-size: 0.8em; text-align: center; margin: 0 0 10px 0;">State Variables: Q1 Q0</p>
+                <table class="data-table">
+                    <tr><th>Flip-Flop</th><th>Input</th><th>Equation</th></tr>
+                    <tr id="row-ff1-1">
+                        <td rowspan="2" id="cell-ff1-span">FF for Q1</td>
+                        <td id="lbl-eq-1A">J1</td><td id="eq-1A">...</td>
+                    </tr>
+                    <tr id="row-ff1-2">
+                        <td id="lbl-eq-1B">K1</td><td id="eq-1B">...</td>
+                    </tr>
+                    <tr id="row-ff0-1">
+                        <td rowspan="2" id="cell-ff0-span">FF for Q0</td>
+                        <td id="lbl-eq-0A">J0</td><td id="eq-0A">...</td>
+                    </tr>
+                    <tr id="row-ff0-2">
+                        <td id="lbl-eq-0B">K0</td><td id="eq-0B">...</td>
+                    </tr>
+                    <tr><td colspan="2">Output</td><td id="eq-z">...</td></tr>
+                </table>
+            </div>
+
+            <div class="box" style="flex: 1; display: flex; flex-direction: column;">
+                <div class="section-title">K-Map (Example)</div>
+                <div class="kmap-tabs" id="kmap-tab-container">
+                    <button id="tab-1A" onclick="selectKMap('1A')">J1</button>
+                    <button id="tab-1B" onclick="selectKMap('1B')">K1</button>
+                    <button id="tab-0A" onclick="selectKMap('0A')" class="active">J0</button>
+                    <button id="tab-0B" onclick="selectKMap('0B')">K0</button>
+                    <button id="tab-Z" onclick="selectKMap('Z')">Z</button>
+                </div>
+                <p id="kmap-title-lbl" style="font-size: 0.85em; margin: 0; color: #555;">Map</p>
+                <div class="kmap-container" id="dynamic-kmap-wrapper"></div>
+                <p id="kmap-result" style="text-align: center; font-size: 0.9em; margin-top: auto; color: #333;">...</p>
+            </div>
+        </div>
+
+        <div class="col col-3">
+            <div class="section-title" style="margin-bottom: 5px;">OUTPUT 2: SEQUENTIAL CIRCUIT DIAGRAM</div>
+            <div style="position: absolute; right: 15px; top: 10px; display: flex; gap: 5px; z-index: 10;">
+                <button title="Zoom In" onclick="zoom(0.1)" style="padding: 2px 6px; font-size: 1.2em; border: 1px solid #ccc; background: white; cursor: pointer;">🔍+</button>
+                <button title="Zoom Out" onclick="zoom(-0.1)" style="padding: 2px 6px; font-size: 1.2em; border: 1px solid #ccc; background: white; cursor: pointer;">🔍-</button>
+            </div>
+            
+            <div class="diagram-area" id="diagram-area">
+                <svg id="circuit-svg" width="100%" height="100%" viewBox="0 0 650 550" xmlns="http://www.w3.org/2000/svg">
+                    <defs><circle id="dot" cx="0" cy="0" r="3" fill="#333" /></defs>
+                    <g id="svg-pan-zoom" transform="matrix(1 0 0 1 0 0)">
+                        
+                        <g id="static-components" style="font-family: 'Segoe UI', sans-serif;">
+                            <text id="lbl-X" x="25" y="30" font-size="12" fill="#333">X</text>
+                            <line x1="30" y1="35" x2="30" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                            <text id="lbl-X-not" x="45" y="30" font-size="12" fill="#333">X'</text>
+                            <line x1="50" y1="65" x2="50" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                            <polygon points="30,45 45,52 30,59" fill="white" stroke="#333" stroke-width="1.5"/>
+                            <circle cx="48" cy="52" r="2.5" fill="white" stroke="#333" stroke-width="1.5"/>
+                            <use href="#dot" x="30" y="52" />
+
+                            <g id="ff1-group">
+                                <text x="65" y="30" font-size="12" fill="#333">Q1</text>
+                                <line x1="70" y1="35" x2="70" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                                <text x="82" y="30" font-size="12" fill="#333">Q1'</text>
+                                <line x1="90" y1="35" x2="90" y2="520" stroke="#aaa" stroke-width="1.5"/>
+
+                                <rect x="420" y="100" width="70" height="100" fill="white" stroke="#333" stroke-width="1.5" />
+                                <text x="445" y="120" font-size="12" fill="#333">Q1</text>
+                                <text id="svg-ff1-lbl1" x="425" y="135" font-size="12" fill="#333">J1</text>
+                                <text id="svg-ff1-lbl2" x="425" y="185" font-size="12" fill="#333">K1</text>
+                                <text id="svg-ff1-type" x="435" y="160" font-size="10" fill="#666">JK-FF</text>
+                                <text x="475" y="135" font-size="12" fill="#333">Q</text>
+                                <text x="470" y="185" font-size="12" fill="#333">Q'</text>
+                                <polygon points="420,165 430,155 440,165" fill="none" stroke="#333" stroke-width="1" />
+                                
+                                <line x1="490" y1="130" x2="580" y2="130" stroke="#333" stroke-width="1.5"/>
+                                <use href="#dot" x="510" y="130" />
+                                <polyline points="510,130 510,20 70,20 70,35" fill="none" stroke="#333" stroke-width="1"/>
+                                <text x="585" y="135" font-size="12" fill="#333">Q1</text>
+
+                                <line x1="490" y1="180" x2="520" y2="180" stroke="#333" stroke-width="1.5"/>
+                                <use href="#dot" x="520" y="180" />
+                                <polyline points="520,180 520,10 90,10 90,35" fill="none" stroke="#333" stroke-width="1"/>
+                            </g>
+
+                            <text x="105" y="30" font-size="12" fill="#333">Q0</text>
+                            <line x1="110" y1="35" x2="110" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                            <text x="122" y="30" font-size="12" fill="#333">Q0'</text>
+                            <line x1="130" y1="35" x2="130" y2="520" stroke="#aaa" stroke-width="1.5"/>
+
+                            <rect x="420" y="280" width="70" height="100" fill="white" stroke="#333" stroke-width="1.5" />
+                            <text x="445" y="300" font-size="12" fill="#333">Q0</text>
+                            <text id="svg-ff0-lbl1" x="425" y="315" font-size="12" fill="#333">J0</text>
+                            <text id="svg-ff0-lbl2" x="425" y="365" font-size="12" fill="#333">K0</text>
+                            <text id="svg-ff0-type" x="435" y="340" font-size="10" fill="#666">JK-FF</text>
+                            <text x="475" y="315" font-size="12" fill="#333">Q</text>
+                            <text x="470" y="365" font-size="12" fill="#333">Q'</text>
+                            <polygon points="420,345 430,335 440,345" fill="none" stroke="#333" stroke-width="1" />
+                            
+                            <line x1="490" y1="310" x2="580" y2="310" stroke="#333" stroke-width="1.5"/>
+                            <use href="#dot" x="530" y="310" />
+                            <polyline points="530,310 530,25 110,25 110,35" fill="none" stroke="#333" stroke-width="1"/>
+                            <text x="585" y="315" font-size="12" fill="#333">Q0</text>
+
+                            <line x1="490" y1="360" x2="540" y2="360" stroke="#333" stroke-width="1.5"/>
+                            <use href="#dot" x="540" y="360" />
+                            <polyline points="540,360 540,5 130,5 130,35" fill="none" stroke="#333" stroke-width="1"/>
+
+                            <polyline points="20,480 400,480 400,340 420,340" fill="none" stroke="#888" stroke-width="1.5" />
+                            <use href="#dot" x="400" y="480" />
+                            <polyline id="clk-ff1-line" points="400,480 400,160 420,160" fill="none" stroke="#888" stroke-width="1.5" />
+                            <text x="10" y="475" font-size="12" fill="#666">CLK</text>
+
+                            <text id="lbl-out-Z" x="585" y="455" font-size="14" fill="#333">Z</text>
+                            <line x1="560" y1="450" x2="580" y2="450" stroke="#333" stroke-width="1.5"/>
+                        </g>
+
+                        <g id="dynamic-routing-layer"></g>
+                    </g>
+                </svg>
+            </div>
+            
+            <ul class="footer-note">
+                <li>Circuit diagram is generated based on simplified equations.</li>
+                <li>Click on components for more details.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // UI 互動 (平移縮放)
+    // ==========================================
+    const svgArea = document.getElementById('diagram-area');
+    const svgGroup = document.getElementById('svg-pan-zoom');
+    let scale = 1, panX = 0, panY = 0;
+    let isDragging = false, startX, startY;
+
+    function applyTransform() { svgGroup.setAttribute('transform', `matrix(${scale} 0 0 ${scale} ${panX} ${panY})`); }
+    function zoom(delta) { scale = Math.max(0.5, Math.min(2, scale + delta)); applyTransform(); }
+    function resetZoom() { scale = 1; panX = 0; panY = 0; applyTransform(); }
+
+    svgArea.addEventListener('wheel', (e) => { e.preventDefault(); zoom(e.deltaY > 0 ? -0.1 : 0.1); });
+    svgArea.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY; });
+    window.addEventListener('mousemove', (e) => { if(isDragging) { panX = e.clientX - startX; panY = e.clientY - startY; applyTransform(); }});
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // ==========================================
+    // 系統資料流與事件綁定
+    // ==========================================
+    let kmapData = {};
+    let currentKMapTab = '0A';
+    let currentInVar = 'X';
+    let currentNumVars = 3;
+
+    document.querySelectorAll('input[name="model"]').forEach(el => el.addEventListener('change', handleModelChange));
+    document.querySelectorAll('input[name="ff_type"], #input-var, #output-var').forEach(el => el.addEventListener('change', triggerUpdate));
+    document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
+    
+    document.getElementById('state-table').addEventListener('input', (e) => {
+        if (e.target.classList.contains('editable-cell')) triggerUpdate();
+    });
+
+    function getTableData() {
+        const rows = document.getElementById('state-table').getElementsByTagName('tr');
+        let data = []; let lastZ = '0';
+        for(let i=1; i<rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            if (cells.length < 3) continue;
+            let ps = cells[0].innerText.trim(); let x = cells[1].innerText.trim(); let ns = cells[2].innerText.trim();
+            let z = (cells.length === 4) ? cells[3].innerText.trim() : lastZ;
+            if (cells.length === 4) lastZ = z;
+            data.push({ps, x, ns, z});
+        }
+        return data;
+    }
+
+    function renderTableHTML(data) {
+        const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+        const tbody = document.querySelector('#state-table tbody');
+        const thOut = document.getElementById('th-out');
+        const outVar = document.getElementById('output-var').value || 'Z';
+
+        thOut.innerHTML = `<span class="dyn-out">${outVar}</span>`;
+
+        let html = '';
+        for(let i=0; i<data.length; i++) {
+            html += `<tr><td class="editable-cell" contenteditable="true">${data[i].ps}</td><td class="editable-cell" contenteditable="true">${data[i].x}</td><td class="editable-cell" contenteditable="true">${data[i].ns}</td>`;
+            if (isMoore) {
+                if (i % 2 === 0) html += `<td class="editable-cell" contenteditable="true" rowspan="2" style="vertical-align: middle;">${data[i].z}</td>`;
+            } else {
+                html += `<td class="editable-cell" contenteditable="true">${data[i].z}</td>`;
+            }
+            html += `</tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+
+    function handleModelChange() { let data = getTableData(); renderTableHTML(data); triggerUpdate(); }
+
+    function updateRowCount() {
+        const count = parseInt(document.querySelector('input[name="row_count"]:checked').value);
+        let data = [];
+        const states = ['A','A','B','B','C','C','D','D'];
+        const inputs = ['0','1','0','1','0','1','0','1'];
+        const nextSt = ['A','B','C','A','A','C','B','C']; 
+        const zVals  = ['0','0','1','0','1','1','0','1'];
+        for(let i=0; i<count; i++) data.push({ ps: states[i], x: inputs[i], ns: nextSt[i], z: zVals[i] });
+        renderTableHTML(data);
+        triggerUpdate();
+    }
+
+    function enforceMooreSync() {
+        const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+        if(!isMoore) return;
+        const table = document.getElementById('state-table');
+        const rows = table.getElementsByTagName('tr');
+        let zMap = {};
+        for(let i=1; i<rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            if(cells.length < 4) continue;
+            let ps = cells[0].innerText.trim().toUpperCase();
+            let zCell = cells[3]; let val = zCell.innerText.trim();
+            if (zMap[ps] === undefined && val !== '') zMap[ps] = val; 
+            else if (zMap[ps] !== undefined && val !== zMap[ps]) {
+                zCell.innerText = zMap[ps]; 
+                zCell.classList.add('sync-flash');
+                setTimeout(() => zCell.classList.remove('sync-flash'), 500);
+            }
+        }
+    }
+
+    function clearTable() {
+        let data = getTableData();
+        for(let i=0; i<data.length; i++) { data[i].ns = ''; data[i].z = ''; }
+        renderTableHTML(data); triggerUpdate();
+    }
+
+    function loadExample() {
+        document.querySelector('input[name="row_count"][value="6"]').checked = true;
+        document.querySelector('input[name="ff_type"][value="jk"]').checked = true;
+        document.querySelector('input[name="model"][value="mealy"]').checked = true;
+        
+        const data = [
+            {ps:'A', x:'0', ns:'A', z:'0'}, {ps:'A', x:'1', ns:'B', z:'0'},
+            {ps:'B', x:'0', ns:'C', z:'1'}, {ps:'B', x:'1', ns:'A', z:'0'},
+            {ps:'C', x:'0', ns:'A', z:'1'}, {ps:'C', x:'1', ns:'C', z:'1'}
+        ];
+        document.getElementById('input-var').value = 'X';
+        document.getElementById('output-var').value = 'Z';
+        
+        renderTableHTML(data);
+        triggerUpdate();
+    }
+
+    function triggerUpdate() {
+        enforceMooreSync(); 
+        document.getElementById('dynamic-routing-layer').innerHTML = ''; 
+        setTimeout(runLogicSynthesis, 50); 
+    }
+
+    // ==========================================
+    // 卡諾圖產生器
+    // ==========================================
+    function renderKMapTemplate(numVars, inVar) {
+        const wrapper = document.getElementById('dynamic-kmap-wrapper');
+        if (numVars === 2) {
+            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="2" style="font-size:12px;">${inVar}</td></tr><tr><td style="font-size:12px;">0</td><td style="font-size:12px;">1</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:12px;">Q0</td><td style="font-size:12px;">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td></tr><tr><td style="font-size:12px;">1</td><td class="kmap-cell" id="kmap-2"></td><td class="kmap-cell" id="kmap-3"></td></tr></table>`;
+        } else {
+            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="4" style="font-size:12px;">Q0 ${inVar}</td></tr><tr><td style="font-size:12px;">00</td><td style="font-size:12px;">01</td><td style="font-size:12px;">11</td><td style="font-size:12px;">10</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:12px;">Q1</td><td style="font-size:12px;">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td><td class="kmap-cell" id="kmap-3"></td><td class="kmap-cell" id="kmap-2"></td></tr><tr><td style="font-size:12px;">1</td><td class="kmap-cell" id="kmap-4"></td><td class="kmap-cell" id="kmap-5"></td><td class="kmap-cell" id="kmap-7"></td><td class="kmap-cell" id="kmap-6"></td></tr></table>`;
+        }
+    }
+
+    function selectKMap(pin) {
+        currentKMapTab = pin;
+        document.querySelectorAll('.kmap-tabs button').forEach(btn => btn.classList.remove('active'));
+        const btn = document.getElementById('tab-' + pin);
+        if(btn) btn.classList.add('active');
+
+        const data = kmapData[pin];
+        if(!data) return;
+
+        document.getElementById('kmap-title-lbl').innerText = `${data.label}`;
+        let size = 1 << currentNumVars;
+        for(let i=0; i<size; i++) {
+            let el = document.getElementById('kmap-'+i);
+            if(el) {
+                let val = data.array[i] || 'X';
+                el.innerText = val;
+            }
+        }
+        document.getElementById('kmap-result').innerHTML = `(Simplified) ${data.label} = ${data.eq}`;
+    }
+
+    // ==========================================
+    // 邏輯合成與解析核心
+    // ==========================================
+    function getFFInputs(q, nq, type) {
+        if (type === 'jk') {
+            if (q===0 && nq===0) return ['0', 'X']; if (q===0 && nq===1) return ['1', 'X'];
+            if (q===1 && nq===0) return ['X', '1']; if (q===1 && nq===1) return ['X', '0'];
+        } else if (type === 'sr') {
+            if (q===0 && nq===0) return ['0', 'X']; if (q===0 && nq===1) return ['1', '0'];
+            if (q===1 && nq===0) return ['0', '1']; if (q===1 && nq===1) return ['X', '0'];
+        } else if (type === 'd') { return [nq.toString(), null]; } 
+        else if (type === 't') { return [q===nq ? '0':'1', null]; } 
+        return ['X', 'X'];
+    }
+
+    function runLogicSynthesis() {
+        currentInVar = document.getElementById('input-var').value || 'X';
+        const outVar = document.getElementById('output-var').value || 'Z';
+        const ffType = document.querySelector('input[name="ff_type"]:checked').value;
+        const isSinglePin = (ffType === 't' || ffType === 'd');
+
+        document.querySelectorAll('.dyn-in').forEach(el => el.textContent = currentInVar);
+        document.querySelectorAll('.dyn-out').forEach(el => el.textContent = outVar);
+        document.getElementById('lbl-X').textContent = currentInVar;
+        document.getElementById('lbl-X-not').textContent = currentInVar + "'";
+        document.getElementById('lbl-out-Z').textContent = outVar;
+
+        const lbl1A = ffType === 'jk' ? 'J1' : (ffType === 'sr' ? 'S1' : (ffType === 't' ? 'T1' : 'D1'));
+        const lbl1B = ffType === 'jk' ? 'K1' : (ffType === 'sr' ? 'R1' : '');
+        const lbl0A = ffType === 'jk' ? 'J0' : (ffType === 'sr' ? 'S0' : (ffType === 't' ? 'T0' : 'D0'));
+        const lbl0B = ffType === 'jk' ? 'K0' : (ffType === 'sr' ? 'R0' : '');
+
+        let tableData = getTableData();
+        let uniqueStates = new Set();
+        for(let i=0; i<tableData.length; i++) {
+            if(tableData[i].ps) uniqueStates.add(tableData[i].ps.toUpperCase()); 
+            if(tableData[i].ns) uniqueStates.add(tableData[i].ns.toUpperCase());
+        }
+        
+        let sortedStates = Array.from(uniqueStates).sort();
+        let ffCount = sortedStates.length <= 2 ? 1 : 2;
+        currentNumVars = ffCount + 1; 
+
+        let stateMap = {};
+        sortedStates.forEach((s, idx) => {
+            if(ffCount === 1 && idx < 2) stateMap[s] = [idx % 2];
+            else if(ffCount === 2 && idx < 4) stateMap[s] = [Math.floor(idx/2), idx%2];
+        });
+        
+        document.getElementById('state-assign-lbl').innerText = sortedStates.map(s => `${s}=${stateMap[s].join('')}`).join(' , ') || '...';
+
+        document.getElementById('row-ff1-1').style.display = (ffCount === 1) ? 'none' : 'table-row';
+        document.getElementById('row-ff1-2').style.display = (ffCount === 1 || isSinglePin) ? 'none' : 'table-row';
+        document.getElementById('row-ff0-2').style.display = isSinglePin ? 'none' : 'table-row';
+        document.getElementById('cell-ff0-span').rowSpan = isSinglePin ? 1 : 2;
+
+        document.getElementById('tab-1A').style.display = (ffCount === 1) ? 'none' : 'inline-block';
+        document.getElementById('tab-1B').style.display = (ffCount === 1 || isSinglePin) ? 'none' : 'inline-block';
+        document.getElementById('tab-0B').style.display = isSinglePin ? 'none' : 'inline-block';
+        if((ffCount === 1 && (currentKMapTab === '1A' || currentKMapTab === '1B')) || (isSinglePin && currentKMapTab.endsWith('B'))) currentKMapTab = '0A';
+
+        document.getElementById('ff1-group').style.display = (ffCount === 1) ? 'none' : 'block';
+        document.getElementById('clk-ff1-line').style.display = (ffCount === 1) ? 'none' : 'block';
+
+        document.getElementById('lbl-eq-1A').textContent = lbl1A; document.getElementById('lbl-eq-1B').textContent = lbl1B;
+        document.getElementById('lbl-eq-0A').textContent = lbl0A; document.getElementById('lbl-eq-0B').textContent = lbl0B;
+        document.getElementById('tab-1A').textContent = lbl1A; document.getElementById('tab-1B').textContent = lbl1B;
+        document.getElementById('tab-0A').textContent = lbl0A; document.getElementById('tab-0B').textContent = lbl0B;
+
+        document.getElementById('svg-ff1-type').textContent = ffType.toUpperCase() + '-FF';
+        document.getElementById('svg-ff0-type').textContent = ffType.toUpperCase() + '-FF';
+        document.getElementById('svg-ff1-lbl1').textContent = lbl1A; document.getElementById('svg-ff1-lbl2').textContent = lbl1B;
+        document.getElementById('svg-ff0-lbl1').textContent = lbl0A; document.getElementById('svg-ff0-lbl2').textContent = lbl0B;
+        document.getElementById('svg-ff1-lbl1').setAttribute('y', isSinglePin ? '160' : '135');
+        document.getElementById('svg-ff0-lbl1').setAttribute('y', isSinglePin ? '340' : '315');
+
+        let size = 1 << currentNumVars;
+        let IN1_A = Array(size).fill('X'), IN1_B = Array(size).fill('X');
+        let IN0_A = Array(size).fill('X'), IN0_B = Array(size).fill('X');
+        let Z = Array(size).fill('X');
+
+        for(let i=0; i<tableData.length; i++) {
+            let ps = tableData[i].ps.toUpperCase(), ns = tableData[i].ns.toUpperCase(); 
+            if(!stateMap[ps] || !stateMap[ns]) continue;
+            let q_ps = stateMap[ps], q_ns = stateMap[ns];
+            let x = (tableData[i].x === '1') ? 1 : 0; 
+            let idx = ffCount === 1 ? ((q_ps[0]<<1) | x) : ((q_ps[0]<<2) | (q_ps[1]<<1) | x);
+
+            if (ffCount === 1) {
+                let ff0 = getFFInputs(q_ps[0], q_ns[0], ffType);
+                IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1];
+            } else {
+                let ff1 = getFFInputs(q_ps[0], q_ns[0], ffType); let ff0 = getFFInputs(q_ps[1], q_ns[1], ffType);
+                IN1_A[idx] = ff1[0]; IN1_B[idx] = ff1[1];
+                IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1];
+            }
+            let zval = tableData[i].z;
+            Z[idx] = (zval === '1' || zval === '0') ? zval : 'X';
+        }
+
+        let eq1A = ffCount===1 ? '' : minimizeLogicExact(IN1_A, currentInVar, currentNumVars);
+        let eq1B = (ffCount===1 || isSinglePin) ? null : minimizeLogicExact(IN1_B, currentInVar, currentNumVars);
+        let eq0A = minimizeLogicExact(IN0_A, currentInVar, currentNumVars);
+        let eq0B = isSinglePin ? null : minimizeLogicExact(IN0_B, currentInVar, currentNumVars);
+        let eqZ  = minimizeLogicExact(Z, currentInVar, currentNumVars);
+
+        if(ffCount > 1) document.getElementById('eq-1A').innerHTML = eq1A;
+        if(ffCount > 1 && !isSinglePin) document.getElementById('eq-1B').innerHTML = eq1B;
+        document.getElementById('eq-0A').innerHTML = eq0A;
+        if(!isSinglePin) document.getElementById('eq-0B').innerHTML = eq0B;
+        document.getElementById('eq-z').innerHTML  = eqZ;
+        
+        kmapData = {}; 
+        if(ffCount > 1) {
+            kmapData['1A'] = { array: IN1_A, eq: eq1A, label: lbl1A };
+            if(!isSinglePin) kmapData['1B'] = { array: IN1_B, eq: eq1B, label: lbl1B };
+        }
+        kmapData['0A'] = { array: IN0_A, eq: eq0A, label: lbl0A };
+        if(!isSinglePin) kmapData['0B'] = { array: IN0_B, eq: eq0B, label: lbl0B };
+        kmapData['Z']  = { array: Z, eq: eqZ, label: outVar };
+
+        renderKMapTemplate(currentNumVars, currentInVar);
+        selectKMap(currentKMapTab);
+        drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, currentInVar, isSinglePin, lbl1A, lbl1B, lbl0A, lbl0B, ffCount);
+    }
+
+    // ==========================================
+    // Quine-McCluskey 窮舉化簡
+    // ==========================================
+    function minimizeLogicExact(outputs, varName, numVars) {
+        let ones = [], zeros = []; let maxVal = 1 << numVars;
+        for(let i=0; i<maxVal; i++) { if(outputs[i] === '1') ones.push(i); else if(outputs[i] === '0') zeros.push(i); }
+        if(ones.length === 0) return '0'; if(zeros.length === 0) return '1';
+
+        let implicants = [];
+        const generate = (prefix, length) => { if(prefix.length === length) { implicants.push(prefix); return; } for(let c of ['0','1','-']) generate(prefix + c, length); };
+        generate('', numVars);
+
+        let valid = implicants.filter(imp => { for(let z of zeros) { let zStr = z.toString(2).padStart(numVars, '0'); let match = true; for(let i=0; i<numVars; i++) { if(imp[i] !== '-' && imp[i] !== zStr[i]) { match = false; break; } } if(match) return false; } return true; });
+        let primes = valid.filter(imp => { for(let i=0; i<numVars; i++) { if(imp[i] !== '-') { let expanded = imp.substring(0,i) + '-' + imp.substring(i+1); if(valid.includes(expanded)) return false; } } return true; });
+
+        let bestSubset = []; let minCost = Infinity; let nPrimes = primes.length;
+        for(let i=1; i < (1<<nPrimes); i++) {
+            let subset = []; for(let j=0; j<nPrimes; j++) { if(i & (1<<j)) subset.push(primes[j]); }
+            let covered = new Set();
+            for(let imp of subset) { for(let o of ones) { let oStr = o.toString(2).padStart(numVars, '0'); let match = true; for(let k=0; k<numVars; k++) { if(imp[k] !== '-' && imp[k] !== oStr[k]) { match = false; break; } } if(match) covered.add(o); } }
+            if(covered.size === ones.length) {
+                let cost = subset.length * 10; for(let imp of subset) { for(let k=0; k<numVars; k++) if(imp[k] !== '-') cost += 1; }
+                if(cost < minCost) { minCost = cost; bestSubset = subset; }
+            }
+        }
+
+        return bestSubset.map(imp => {
+            let terms = [];
+            if(numVars === 3) {
+                if(imp[0] === '1') terms.push('Q1');    if(imp[0] === '0') terms.push("Q1'");
+                if(imp[1] === '1') terms.push('Q0');    if(imp[1] === '0') terms.push("Q0'");
+                if(imp[2] === '1') terms.push(varName); if(imp[2] === '0') terms.push(varName+"'");
+            } else {
+                if(imp[0] === '1') terms.push('Q0');    if(imp[0] === '0') terms.push("Q0'");
+                if(imp[1] === '1') terms.push(varName); if(imp[1] === '0') terms.push(varName+"'");
+            }
+            if(terms.length === 0) return '1';
+            return terms.join(' · ');
+        }).join(' + ');
+    }
+
+    // ==========================================
+    // SVG 自動佈線繪製引擎 (採用極簡灰色系)
+    // ==========================================
+    function drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, inVar, isSinglePin, l1A, l1B, l0A, l0B, ffCount) {
+        let svg = '';
+        const busMap = { [inVar]: 30, [inVar+"'"]: 50, "Q1": 70, "Q1'": 90, "Q0": 110, "Q0'": 130 };
+        const color = "#555"; // 統一用深灰色，還原老師的簡潔感
+        
+        function drawSOP(equation, targetX, targetY, labelText) {
+            if (!equation) return ''; 
+            let html = '';
+            
+            if (equation === "0" || equation === "1") {
+                html += `<text x="${targetX - 25}" y="${targetY - 5}" font-size="12" fill="${color}">${equation}</text>`;
+                html += `<line class="animated-wire" x1="${targetX - 30}" y1="${targetY}" x2="${targetX}" y2="${targetY}" stroke="${color}"/>`;
+                return html;
+            }
+            
+            let terms = equation.split(' + '); let orX = targetX - 50; let andX = targetX - 130;
+            const drawWire = (x1, y1, x2, y2) => { let path = `M ${x1} ${y1}`; if (x1 !== x2 && y1 !== y2) { path += ` L ${x2} ${y1} L ${x2} ${y2}`; } else { path += ` L ${x2} ${y2}`; } return `<path d="${path}" class="animated-wire" stroke="${color}"/>`; };
+            const drawDot = (x, y) => `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}" class="animated-gate"/>`;
+            const gateAND = (x, y) => `<path d="M ${x-25} ${y-12} L ${x-5} ${y-12} A 12 12 0 0 1 ${x-5} ${y+12} L ${x-25} ${y+12} Z" fill="white" stroke="${color}" stroke-width="1.5" class="animated-gate"/>`;
+            const gateOR = (x, y) => `<path d="M ${x-25} ${y-15} Q ${x-10} ${y-15} ${x} ${y} Q ${x-10} ${y+15} ${x-25} ${y+15} Q ${x-15} ${y} ${x-25} ${y-15} Z" fill="white" stroke="${color}" stroke-width="1.5" class="animated-gate"/>`;
+            
+            html += `<text x="${targetX - 30}" y="${targetY - 15}" class="highlight-lbl animated-gate" fill="${color}">${labelText}=${equation}</text>`;
+            
+            if (terms.length === 1) { 
+                let vars = terms[0].split(' · ');
+                if (vars.length === 1) { html += drawWire(busMap[vars[0]], targetY, targetX, targetY); html += drawDot(busMap[vars[0]], targetY); } 
+                else { html += gateAND(targetX - 20, targetY); html += drawWire(targetX - 20, targetY, targetX, targetY); vars.forEach((v, i) => { let inY = targetY + (i === 0 ? -6 : 6); html += drawWire(busMap[v], inY, targetX - 45, inY); html += drawDot(busMap[v], inY); }); }
+            } else { 
+                html += gateOR(orX, targetY); html += drawWire(orX, targetY, targetX, targetY);
+                terms.forEach((term, i) => {
+                    let termY = targetY + (i === 0 ? -25 : 25); let orInY = targetY + (i === 0 ? -8 : 8); let vars = term.split(' · ');
+                    if (vars.length === 1) { html += drawWire(busMap[vars[0]], termY, orX - 20, termY); html += `<path d="M ${orX-20} ${termY} L ${orX-20} ${orInY}" class="animated-wire" stroke="${color}"/>`; html += drawDot(busMap[vars[0]], termY); } 
+                    else { html += gateAND(andX, termY); html += `<path d="M ${andX} ${termY} L ${andX+15} ${termY} L ${andX+15} ${orInY} L ${orX-20} ${orInY}" class="animated-wire" stroke="${color}"/>`; vars.forEach((v, vi) => { let inY = termY + (vi === 0 ? -6 : 6); html += drawWire(busMap[v], inY, andX - 25, inY); html += drawDot(busMap[v], inY); }); }
+                });
+            } return html;
+        }
+        
+        if (ffCount > 1) {
+            const y1A = isSinglePin ? 155 : 130;
+            svg += drawSOP(eq1A, 420, y1A, l1A); 
+            if(!isSinglePin) svg += drawSOP(eq1B, 420, 180, l1B);
+        }
+        const y0A = isSinglePin ? 335 : 310;
+        svg += drawSOP(eq0A, 420, y0A, l0A); 
+        if(!isSinglePin) svg += drawSOP(eq0B, 420, 360, l0B);
+        
+        svg += drawSOP(eqZ,  560, 450, 'Z');
+        
+        document.getElementById('dynamic-routing-layer').innerHTML = svg;
+    }
+
+    // 啟動系統
+    window.onload = () => {
+        updateRowCount();
+        loadExample();
+    };
+</script>
+
+</body>
+</html>
