@@ -4,135 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Final Project - 1140511 黃盼盼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        /* ================= 系統色彩變數 (支援深淺色模式) ================= */
+        :root {
+            --bg-body: #eef2f5;
+            --bg-panel: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #cccccc;
+            --shadow-soft: 0 4px 10px rgba(0,0,0,0.05);
+            --header-bg: #6c757d;
+            --header-text: #ffffff;
+            --table-th: #f9f9f9;
+            --svg-line: #333333;
+            --svg-bg: #ffffff;
+            --grid-color: #eeeeee;
+        }
+
+        body.dark-mode {
+            --bg-body: #121212;
+            --bg-panel: #1e1e1e;
+            --text-main: #f8f9fa;
+            --text-muted: #adb5bd;
+            --border-color: #444444;
+            --shadow-soft: 0 10px 25px rgba(0,0,0,0.5);
+            --header-bg: #000000;
+            --header-text: #5bc0de;
+            --table-th: #2b2b2b;
+            --svg-line: #f8f9fa;
+            --svg-bg: #1e1e1e;
+            --grid-color: #2a2a2a;
+        }
+
         /* ================= 極簡學術風全域排版 ================= */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #eef2f5; 
-            margin: 0; 
-            padding: 20px; 
-            color: #333; 
-        }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: var(--bg-body); margin: 0; padding: 20px; color: var(--text-main); transition: 0.3s; }
         
-        .main-title { 
-            font-family: 'Times New Roman', Times, serif; /* 老師範例的襯線字體 */
-            font-size: 2.5em;
-            color: #666; 
-            font-weight: normal;
-            border-bottom: 1px solid #ccc; 
-            padding-bottom: 5px; 
-            margin-top: 0; 
-            margin-bottom: 10px;
-            display: flex; 
-            align-items: baseline; 
-            gap: 15px;
-        }
-        .main-title span { 
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.35em; 
-            color: #888;
-            font-weight: bold;
-        }
+        .main-title { font-family: 'Times New Roman', Times, serif; font-size: 2.5em; color: var(--text-muted); font-weight: normal; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-top: 0; margin-bottom: 10px; display: flex; align-items: baseline; gap: 15px; transition: 0.3s;}
+        .main-title span { font-family: 'Segoe UI', sans-serif; font-size: 0.35em; color: var(--text-muted); font-weight: bold; }
 
-        /* 視窗標題列風格 */
-        .header { 
-            background-color: #6c757d; 
-            color: white; 
-            padding: 8px 15px; 
-            font-size: 1.1em; 
-            font-weight: 600; 
-            border-top-left-radius: 4px; 
-            border-top-right-radius: 4px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
+        .header { background-color: var(--header-bg); color: var(--header-text); padding: 8px 15px; font-size: 1.1em; font-weight: 600; border-top-left-radius: 4px; border-top-right-radius: 4px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;}
         
-        /* 視窗控制按鈕 */
-        .window-controls { letter-spacing: 5px; font-family: monospace; font-size: 1.2em; opacity: 0.8;}
+        .theme-toggle { background: transparent; border: 1px solid var(--header-text); color: var(--header-text); padding: 2px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .theme-toggle:hover { background: var(--header-text); color: var(--header-bg); }
 
-        .container { 
-            display: flex; 
-            gap: 10px; 
-            background-color: white; 
-            padding: 10px; 
-            border-bottom-left-radius: 4px; 
-            border-bottom-right-radius: 4px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            min-height: 80vh; 
-        }
+        .container { display: flex; flex-wrap: wrap; gap: 10px; background-color: var(--bg-panel); padding: 10px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; box-shadow: var(--shadow-soft); min-height: 80vh; transition: 0.3s;}
         
-        /* ================= 三大區塊三色邊框設計 ================= */
-        .col { padding: 12px; background-color: #fcfcfc; }
-        
-        /* 左欄：紅色系 */
-        .col-1 { flex: 1; min-width: 280px; border: 2px solid #d9534f; border-radius: 2px; }
+        /* ================= 系統說明面板 (Quick Start Guide) ================= */
+        .usage-guide { width: 100%; box-sizing: border-box; background-color: #e8f4f8; border-left: 5px solid #5bc0de; padding: 12px 20px; margin-bottom: 5px; border-radius: 2px; color: #333; font-size: 0.95em; line-height: 1.6; }
+        .usage-guide strong { color: #5bc0de; }
+        .usage-guide ul { margin: 5px 0 0 0; padding-left: 25px; }
+        .usage-guide .highlight-text { color: #d9534f; font-weight: bold; background: rgba(217,83,79,0.1); padding: 2px 6px; border-radius: 4px; }
+        .dark-mode .usage-guide { background-color: #2a363b; border-color: #48cae4; color: #f8f9fa; }
+        .dark-mode .usage-guide strong { color: #48cae4; }
+        .dark-mode .usage-guide .highlight-text { color: #ff6b6b; background: rgba(255,107,107,0.2); }
+
+        /* ================= 三大區塊邊框設計 ================= */
+        .col { padding: 12px; background-color: rgba(0,0,0,0.02); border-radius: 2px; }
+        .col-1 { flex: 1; min-width: 280px; border: 2px solid #d9534f; }
         .col-1 .section-title { color: #d9534f; }
-        
-        /* 中欄：藍色系 */
-        .col-2 { flex: 1.2; min-width: 320px; border: 2px solid #5bc0de; border-radius: 2px; display: flex; flex-direction: column; gap: 10px; }
+        .col-2 { flex: 1.2; min-width: 320px; border: 2px solid #5bc0de; display: flex; flex-direction: column; gap: 10px; }
         .col-2 .section-title { color: #5bc0de; }
         .col-2 .box { border: 1px solid #5bc0de; }
-
-        /* 右欄：綠色系 */
-        .col-3 { flex: 2.2; min-width: 450px; border: 2px solid #5cb85c; border-radius: 2px; display: flex; flex-direction: column;}
+        .col-3 { flex: 2.2; min-width: 450px; border: 2px solid #5cb85c; display: flex; flex-direction: column; position: relative;}
         .col-3 .section-title { color: #5cb85c; }
         
         /* ================= 內部區塊與表格 ================= */
         .section-title { font-size: 0.9em; font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; }
-        .box { border: 1px solid #ccc; padding: 12px; margin-bottom: 12px; background-color: white; border-radius: 2px; }
+        .box { border: 1px solid var(--border-color); padding: 12px; margin-bottom: 12px; background-color: var(--bg-panel); border-radius: 2px; transition: 0.3s;}
         
-        table.data-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85em; table-layout: fixed; background: white;}
-        table.data-table th, table.data-table td { border: 1px solid #ddd; padding: 6px; color: #333; }
-        table.data-table th { background-color: #f9f9f9; color: #555; }
+        table.data-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85em; table-layout: fixed; background: var(--bg-panel);}
+        table.data-table th, table.data-table td { border: 1px solid var(--border-color); padding: 6px; color: var(--text-main); }
+        table.data-table th { background-color: var(--table-th); }
         
-        .editable-cell { cursor: text; transition: all 0.2s; outline: none; color: #333;}
-        .editable-cell:hover { background-color: #f0f0f0; }
-        .editable-cell:focus { background-color: #e8f4f8; box-shadow: inset 0 0 0 1px #5bc0de; }
+        .editable-cell { cursor: text; transition: all 0.2s; outline: none; font-family: 'Fira Code', monospace; color: #d9534f; font-weight: bold;}
+        .dark-mode .editable-cell { color: #ff6b6b; }
+        .editable-cell:hover { background-color: rgba(0,0,0,0.05); }
+        .editable-cell:focus { background-color: rgba(91,192,222,0.1); box-shadow: inset 0 0 0 1px #5bc0de; }
         
-        /* 輸入框更緊湊 */
-        .var-input { width: 80%; padding: 4px; border: 1px solid #ccc; border-radius: 2px; font-weight: bold; text-align: center; color: #333; font-size: 0.9em;}
+        .var-input { width: 80%; padding: 4px; border: 1px solid var(--border-color); border-radius: 2px; font-weight: bold; text-align: center; color: #5bc0de; font-size: 0.9em; font-family: 'Fira Code', monospace; background: transparent;}
         
         /* ================= 按鈕與選項 ================= */
-        .radio-group { margin-bottom: 4px; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 10px; color: #555; }
+        .radio-group { margin-bottom: 4px; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 10px; color: var(--text-muted); }
         .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        button.action-btn { flex: 1; padding: 6px 10px; border: 1px solid #ccc; background-color: #f9f9f9; cursor: pointer; border-radius: 2px; font-size: 0.85em; color: #555; transition: 0.2s; }
-        button.action-btn:hover { background-color: #e9ecef; color: #000; }
+        button.action-btn { flex: 1; padding: 6px 10px; border: 1px solid var(--border-color); background-color: var(--table-th); cursor: pointer; border-radius: 2px; font-size: 0.85em; color: var(--text-main); transition: 0.2s; font-weight: bold;}
+        button.action-btn:hover { filter: brightness(0.9); }
 
         /* ================= 卡諾圖 (K-Map) ================= */
         .kmap-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; }
-        .kmap-tabs button { padding: 4px 12px; border: 1px solid #5bc0de; background: #fff; color: #5bc0de; font-size: 0.8em; border-radius: 2px; cursor: pointer;}
-        .kmap-tabs button.active { background: #5bc0de; color: white; border-color: #46b8da;}
+        .kmap-tabs button { padding: 4px 12px; border: 1px solid #5bc0de; background: var(--bg-panel); color: #5bc0de; font-size: 0.8em; border-radius: 2px; cursor: pointer; font-weight: bold;}
+        .kmap-tabs button.active { background: #5bc0de; color: white;}
         .kmap-container { margin: 5px auto; display: flex; justify-content: center; align-items: center; min-height: 100px;}
-        .kmap-table { border-collapse: collapse; text-align: center; font-size: 13px; background: white; margin: 0 auto; }
-        .kmap-table td { padding: 2px 6px; border: none; color: #555;}
-        .kmap-table .kmap-cell { border: 1px solid #555 !important; width: 35px; height: 35px; font-weight: normal; color: #000;}
+        .kmap-table { border-collapse: collapse; text-align: center; font-size: 13px; margin: 0 auto; background: var(--bg-panel);}
+        .kmap-table td { padding: 2px 6px; border: none; color: var(--text-main); font-family: 'Fira Code', monospace;}
+        .kmap-table .kmap-cell { border: 1px solid var(--text-muted) !important; width: 35px; height: 35px; font-weight: bold; color: #d9534f; font-size: 1.1em;}
+        .dark-mode .kmap-table .kmap-cell { color: #ff6b6b; border-color: #666 !important;}
         
-        /* ================= 電路圖區域 ================= */
-        .diagram-area { flex: 1; width: 100%; min-height: 500px; background-color: #fff; position: relative; overflow: hidden; border: 1px solid #eee;}
-        .var-text { font-weight: bold; color: #333; }
+        /* ================= 電路圖區域與工具列 ================= */
+        .svg-toolbar { position: absolute; right: 15px; top: 10px; display: flex; gap: 5px; z-index: 10; }
+        .svg-toolbar button { padding: 2px 6px; font-size: 1.1em; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); cursor: pointer; border-radius: 2px;}
+        .svg-toolbar button:hover { background: var(--table-th); }
 
-        /* 訊號線流動特效保持，但顏色改為較素雅的灰黑色系 */
-        .animated-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: flow 0.6s linear infinite; }
+        .diagram-area { flex: 1; width: 100%; min-height: 500px; background-color: var(--svg-bg); position: relative; overflow: hidden; border: 1px solid var(--border-color); cursor: grab; transition: 0.3s;}
+        .diagram-area:active { cursor: grabbing; }
+        
+        /* 讓方程式不會被斷行擠成一坨 */
+        .var-text { font-family: 'Fira Code', monospace; color: #d9534f; white-space: nowrap; }
+        .dark-mode .var-text { color: #ff6b6b; }
+
+        .animated-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: flow 0.6s linear infinite; transition: opacity 0.3s, filter 0.3s, stroke-width 0.3s;}
         @keyframes flow { from { stroke-dashoffset: 10; } to { stroke-dashoffset: 0; } }
-        
-        .animated-gate { animation: popIn 0.3s ease-out forwards; opacity: 0; transform-origin: center; }
+        .animated-gate { animation: popIn 0.3s ease-out forwards; opacity: 0; transform-origin: center; transition: opacity 0.3s, filter 0.3s;}
         @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        .highlight-lbl { font-family: monospace; font-size: 11px; fill: #555; background: white;}
         
-        /* 同步提示 */
-        .sync-flash { animation: flashGrey 0.4s ease-out; }
-        @keyframes flashGrey { 0% { background-color: #ddd; } 100% { background-color: transparent; } }
+        /* ================= 修正的 Hover 發光特效 ================= */
+        .eq-row { cursor: pointer; transition: background 0.2s; }
+        .eq-row:hover { background-color: rgba(91,192,222,0.1) !important; }
+        
+        .dimmed { opacity: 0.15 !important; }
+        
+        /* 線條與邏輯閘路徑變粗、變色發光 */
+        path.glow, line.glow, polyline.glow { 
+            stroke-width: 3.5 !important; 
+            stroke: #d9534f !important; 
+            filter: drop-shadow(0 0 3px #d9534f); 
+            opacity: 1 !important;
+        }
+        /* 邏輯閘上的小圓點變色發光 */
+        circle.glow { 
+            fill: #d9534f !important; 
+            filter: drop-shadow(0 0 3px #d9534f); 
+            opacity: 1 !important;
+        }
+        /* 文字絕對不能變粗，只改變字體顏色與粗細 */
+        text.glow { 
+            fill: #d9534f !important; 
+            stroke: none !important; 
+            stroke-width: 0 !important; 
+            font-weight: 900 !important; 
+            opacity: 1 !important; 
+            filter: drop-shadow(0 0 2px rgba(217,83,79,0.5));
+        }
 
-        /* 腳註資訊 */
-        .footer-note { font-size: 0.75em; color: #888; margin-top: 10px; padding-left: 15px;}
-        .footer-note li { margin-bottom: 3px; }
+        .highlight-lbl { font-family: 'Fira Code', monospace; font-size: 11px; fill: var(--text-muted); }
+        
+        /* 同步防呆提示 */
+        .sync-flash { animation: flashGrey 0.4s ease-out; }
+        @keyframes flashGrey { 0% { background-color: #ffeb3b; color: black; } 100% { background-color: transparent; } }
+        .shake-error { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; background-color: rgba(217, 83, 79, 0.2) !important; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
     </style>
 </head>
 <body>
 
-<div style="max-width: 1300px; margin: 0 auto;">
+<div style="max-width: 1350px; margin: 0 auto;">
     <h1 class="main-title">
         Final Project 
         <span>1140511 黃盼盼</span>
@@ -140,10 +167,21 @@
     
     <div class="header">
         <span>⚙ Sequential Circuit Design Automation System</span>
-        <div class="window-controls">- □ x</div>
+        <div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+        </div>
     </div>
 
     <div class="container">
+        <div class="usage-guide">
+            <strong>💡 系統操作指南 (Quick Start Guide)：</strong>
+            <ul>
+                <li><strong>設定系統 (Setup)：</strong>於左側面板選擇 Mealy/Moore 模型、正反器種類 (JK/SR/D/T) 以及狀態表大小。</li>
+                <li><strong>輸入狀態表 (State Table)：</strong>在表格中直接修改 <code>0</code> 或 <code>1</code>，系統將在背景即時利用 Q-M 演算法運算。</li>
+                <li><strong>動態電路圖互動 (Live Schematic)：</strong>右側將自動由 SVG 引擎繪製電路。 <span class="highlight-text">將滑鼠游標停留在「Equations 方程式表格」上，可發光追蹤電路圖中對應的獨立線路！</span></li>
+            </ul>
+        </div>
+
         <div class="col col-1">
             <div class="box" style="border:none; padding:0; margin-bottom:15px; background:transparent;">
                 <div class="section-title">1. MODEL TYPE</div>
@@ -154,10 +192,10 @@
 
                 <div class="section-title">2. FLIP-FLOP TYPE</div>
                 <div class="radio-group" style="margin-bottom: 15px;">
-                    <label><input type="radio" name="ff_type" value="jk" checked onchange="triggerUpdate()"> JK Flip-Flop</label>
-                    <label><input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR Flip-Flop</label>
-                    <label><input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D Flip-Flop</label>
-                    <label><input type="radio" name="ff_type" value="t" onchange="triggerUpdate()"> T Flip-Flop</label>
+                    <label><input type="radio" name="ff_type" value="jk" checked onchange="triggerUpdate()"> JK-FF</label>
+                    <label><input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR-FF</label>
+                    <label><input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D-FF</label>
+                    <label><input type="radio" name="ff_type" value="t" onchange="triggerUpdate()"> T-FF</label>
                 </div>
 
                 <div class="section-title">3. TABLE SIZE</div>
@@ -175,49 +213,49 @@
                     <div style="flex:1;"><label style="font-size: 0.8em;">Output Variation</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1" oninput="triggerUpdate()"></div>
                 </div>
                 
-                <div style="font-size: 0.8em; color: #5bc0de; font-weight: bold; margin-bottom: 5px;">
-                    Assign: <span id="state-assign-lbl" style="color: #555;">...</span>
+                <div style="font-size: 0.8em; color: #5bc0de; font-weight: bold; margin-bottom: 5px; font-family: 'Fira Code', monospace;">
+                    Assign: <span id="state-assign-lbl" style="color: var(--text-muted);">...</span>
                 </div>
                 
-                <label style="font-size: 0.8em; font-weight:bold;">State Table</label>
                 <table class="data-table" id="state-table" style="margin-top: 5px;">
-                    <thead><tr><th>Present State</th><th><span class="dyn-in">X</span></th><th>Next State</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
+                    <thead><tr><th>State</th><th><span class="dyn-in">X</span></th><th>Next</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
                     <tbody></tbody>
                 </table>
                 <div class="btn-group">
-                    <button class="action-btn" onclick="clearTable()">Clear Table</button>
-                    <button class="action-btn" onclick="loadExample()">Load Example</button>
+                    <button class="action-btn" onclick="clearTable()">Clear</button>
+                    <button class="action-btn" onclick="loadExample()">Reset</button>
                 </div>
             </div>
         </div>
 
         <div class="col col-2">
             <div class="box" style="margin-bottom: 0;">
-                <div class="section-title">OUTPUT 1: FLIP-FLOP INPUT EQUATIONS</div>
-                <p style="font-size: 0.8em; text-align: center; margin: 5px 0;">Flip-Flop Input Equations (Simplified)</p>
-                <p style="font-size: 0.8em; text-align: center; margin: 0 0 10px 0;">State Variables: Q1 Q0</p>
+                <div class="section-title">OUTPUT 1: EQUATIONS</div>
+                <p style="font-size: 0.8em; text-align: center; margin: 5px 0;">(Hover to Inspect Route)</p>
                 <table class="data-table">
-                    <tr><th>Flip-Flop</th><th>Input</th><th>Equation</th></tr>
-                    <tr id="row-ff1-1">
-                        <td rowspan="2" id="cell-ff1-span">FF for Q1</td>
-                        <td id="lbl-eq-1A">J1</td><td id="eq-1A">...</td>
+                    <tr><th>FF</th><th>Pin</th><th>Equation</th></tr>
+                    <tr id="row-ff1-1" class="eq-row" onmouseenter="highlightRoute('1A')" onmouseleave="resetHighlight()">
+                        <td rowspan="2" id="cell-ff1-span" style="font-weight:bold;">Q1</td>
+                        <td id="lbl-eq-1A" style="font-weight: bold; color:#d9534f;">J1</td><td id="eq-1A" class="var-text">...</td>
                     </tr>
-                    <tr id="row-ff1-2">
-                        <td id="lbl-eq-1B">K1</td><td id="eq-1B">...</td>
+                    <tr id="row-ff1-2" class="eq-row" onmouseenter="highlightRoute('1B')" onmouseleave="resetHighlight()">
+                        <td id="lbl-eq-1B" style="font-weight: bold; color:#d9534f;">K1</td><td id="eq-1B" class="var-text">...</td>
                     </tr>
-                    <tr id="row-ff0-1">
-                        <td rowspan="2" id="cell-ff0-span">FF for Q0</td>
-                        <td id="lbl-eq-0A">J0</td><td id="eq-0A">...</td>
+                    <tr id="row-ff0-1" class="eq-row" onmouseenter="highlightRoute('0A')" onmouseleave="resetHighlight()">
+                        <td rowspan="2" id="cell-ff0-span" style="font-weight:bold;">Q0</td>
+                        <td id="lbl-eq-0A" style="font-weight: bold; color:#d9534f;">J0</td><td id="eq-0A" class="var-text">...</td>
                     </tr>
-                    <tr id="row-ff0-2">
-                        <td id="lbl-eq-0B">K0</td><td id="eq-0B">...</td>
+                    <tr id="row-ff0-2" class="eq-row" onmouseenter="highlightRoute('0B')" onmouseleave="resetHighlight()">
+                        <td id="lbl-eq-0B" style="font-weight: bold; color:#d9534f;">K0</td><td id="eq-0B" class="var-text">...</td>
                     </tr>
-                    <tr><td colspan="2">Output</td><td id="eq-z">...</td></tr>
+                    <tr class="eq-row" onmouseenter="highlightRoute('Z')" onmouseleave="resetHighlight()">
+                        <td colspan="2" style="font-weight:bold;">Output</td><td id="eq-z" class="var-text">...</td>
+                    </tr>
                 </table>
             </div>
 
             <div class="box" style="flex: 1; display: flex; flex-direction: column;">
-                <div class="section-title">K-Map (Example)</div>
+                <div class="section-title">K-MAP VIEWER</div>
                 <div class="kmap-tabs" id="kmap-tab-container">
                     <button id="tab-1A" onclick="selectKMap('1A')">J1</button>
                     <button id="tab-1B" onclick="selectKMap('1B')">K1</button>
@@ -225,107 +263,109 @@
                     <button id="tab-0B" onclick="selectKMap('0B')">K0</button>
                     <button id="tab-Z" onclick="selectKMap('Z')">Z</button>
                 </div>
-                <p id="kmap-title-lbl" style="font-size: 0.85em; margin: 0; color: #555;">Map</p>
+                <p id="kmap-title-lbl" style="font-size: 0.85em; margin: 0; color: var(--text-muted); text-align: center; font-family: 'Fira Code', monospace; font-weight: bold;">Map</p>
                 <div class="kmap-container" id="dynamic-kmap-wrapper"></div>
-                <p id="kmap-result" style="text-align: center; font-size: 0.9em; margin-top: auto; color: #333;">...</p>
+                <p id="kmap-result" style="text-align: center; font-size: 0.9em; margin-top: auto; color: var(--text-main); font-weight: bold; font-family: 'Fira Code', monospace;">...</p>
             </div>
         </div>
 
         <div class="col col-3">
-            <div class="section-title" style="margin-bottom: 5px;">OUTPUT 2: SEQUENTIAL CIRCUIT DIAGRAM</div>
-            <div style="position: absolute; right: 15px; top: 10px; display: flex; gap: 5px; z-index: 10;">
-                <button title="Zoom In" onclick="zoom(0.1)" style="padding: 2px 6px; font-size: 1.2em; border: 1px solid #ccc; background: white; cursor: pointer;">🔍+</button>
-                <button title="Zoom Out" onclick="zoom(-0.1)" style="padding: 2px 6px; font-size: 1.2em; border: 1px solid #ccc; background: white; cursor: pointer;">🔍-</button>
+            <div class="section-title" style="margin-bottom: 5px;">OUTPUT 2: LIVE SCHEMATIC</div>
+            <div class="svg-toolbar">
+                <button title="Zoom In" onclick="zoom(0.1)">🔍+</button>
+                <button title="Zoom Out" onclick="zoom(-0.1)">🔍-</button>
+                <button title="Reset View" onclick="resetZoom()">🔄</button>
+                <button title="Export SVG" onclick="exportSVG()">💾</button>
             </div>
             
             <div class="diagram-area" id="diagram-area">
                 <svg id="circuit-svg" width="100%" height="100%" viewBox="0 0 650 550" xmlns="http://www.w3.org/2000/svg">
-                    <defs><circle id="dot" cx="0" cy="0" r="3" fill="#333" /></defs>
+                    <defs><circle id="dot" cx="0" cy="0" r="3" fill="var(--svg-line)" /></defs>
                     <g id="svg-pan-zoom" transform="matrix(1 0 0 1 0 0)">
                         
-                        <g id="static-components" style="font-family: 'Segoe UI', sans-serif;">
-                            <text id="lbl-X" x="25" y="30" font-size="12" fill="#333">X</text>
-                            <line x1="30" y1="35" x2="30" y2="520" stroke="#aaa" stroke-width="1.5"/>
-                            <text id="lbl-X-not" x="45" y="30" font-size="12" fill="#333">X'</text>
-                            <line x1="50" y1="65" x2="50" y2="520" stroke="#aaa" stroke-width="1.5"/>
-                            <polygon points="30,45 45,52 30,59" fill="white" stroke="#333" stroke-width="1.5"/>
-                            <circle cx="48" cy="52" r="2.5" fill="white" stroke="#333" stroke-width="1.5"/>
+                        <g id="static-components" style="font-family: 'Inter', sans-serif;">
+                            <text id="lbl-X" x="25" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">X</text>
+                            <line x1="30" y1="35" x2="30" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
+                            <text id="lbl-X-not" x="45" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">X'</text>
+                            <line x1="50" y1="65" x2="50" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
+                            <polygon points="30,45 45,52 30,59" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="1.5"/>
+                            <circle cx="48" cy="52" r="2.5" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="1.5"/>
                             <use href="#dot" x="30" y="52" />
 
                             <g id="ff1-group">
-                                <text x="65" y="30" font-size="12" fill="#333">Q1</text>
-                                <line x1="70" y1="35" x2="70" y2="520" stroke="#aaa" stroke-width="1.5"/>
-                                <text x="82" y="30" font-size="12" fill="#333">Q1'</text>
-                                <line x1="90" y1="35" x2="90" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                                <text x="65" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
+                                <line x1="70" y1="35" x2="70" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
+                                <text x="82" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q1'</text>
+                                <line x1="90" y1="35" x2="90" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
 
-                                <rect x="420" y="100" width="70" height="100" fill="white" stroke="#333" stroke-width="1.5" />
-                                <text x="445" y="120" font-size="12" fill="#333">Q1</text>
-                                <text id="svg-ff1-lbl1" x="425" y="135" font-size="12" fill="#333">J1</text>
-                                <text id="svg-ff1-lbl2" x="425" y="185" font-size="12" fill="#333">K1</text>
-                                <text id="svg-ff1-type" x="435" y="160" font-size="10" fill="#666">JK-FF</text>
-                                <text x="475" y="135" font-size="12" fill="#333">Q</text>
-                                <text x="470" y="185" font-size="12" fill="#333">Q'</text>
-                                <polygon points="420,165 430,155 440,165" fill="none" stroke="#333" stroke-width="1" />
+                                <rect x="420" y="100" width="70" height="100" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="2" rx="4" />
+                                <text x="445" y="120" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
+                                <text id="svg-ff1-lbl1" x="425" y="135" font-size="12" font-weight="bold" fill="#d9534f">J1</text>
+                                <text id="svg-ff1-lbl2" x="425" y="185" font-size="12" font-weight="bold" fill="#d9534f">K1</text>
+                                <text id="svg-ff1-type" x="435" y="160" font-size="10" fill="var(--text-muted)" font-weight="bold">JK-FF</text>
+                                <text x="475" y="135" font-size="12" font-weight="bold" fill="var(--text-main)">Q</text>
+                                <text x="470" y="185" font-size="12" font-weight="bold" fill="var(--text-main)">Q'</text>
+                                <polygon points="420,165 430,155 440,165" fill="none" stroke="var(--svg-line)" stroke-width="1.5" />
                                 
-                                <line x1="490" y1="130" x2="580" y2="130" stroke="#333" stroke-width="1.5"/>
+                                <line x1="490" y1="130" x2="580" y2="130" stroke="var(--svg-line)" stroke-width="2"/>
                                 <use href="#dot" x="510" y="130" />
-                                <polyline points="510,130 510,20 70,20 70,35" fill="none" stroke="#333" stroke-width="1"/>
-                                <text x="585" y="135" font-size="12" fill="#333">Q1</text>
+                                <polyline points="510,130 510,20 70,20 70,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="4,4"/>
+                                <text x="585" y="135" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
 
-                                <line x1="490" y1="180" x2="520" y2="180" stroke="#333" stroke-width="1.5"/>
+                                <line x1="490" y1="180" x2="520" y2="180" stroke="var(--svg-line)" stroke-width="2"/>
                                 <use href="#dot" x="520" y="180" />
-                                <polyline points="520,180 520,10 90,10 90,35" fill="none" stroke="#333" stroke-width="1"/>
+                                <polyline points="520,180 520,10 90,10 90,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="4,4"/>
                             </g>
 
-                            <text x="105" y="30" font-size="12" fill="#333">Q0</text>
-                            <line x1="110" y1="35" x2="110" y2="520" stroke="#aaa" stroke-width="1.5"/>
-                            <text x="122" y="30" font-size="12" fill="#333">Q0'</text>
-                            <line x1="130" y1="35" x2="130" y2="520" stroke="#aaa" stroke-width="1.5"/>
+                            <text x="105" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
+                            <line x1="110" y1="35" x2="110" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
+                            <text x="122" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q0'</text>
+                            <line x1="130" y1="35" x2="130" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
 
-                            <rect x="420" y="280" width="70" height="100" fill="white" stroke="#333" stroke-width="1.5" />
-                            <text x="445" y="300" font-size="12" fill="#333">Q0</text>
-                            <text id="svg-ff0-lbl1" x="425" y="315" font-size="12" fill="#333">J0</text>
-                            <text id="svg-ff0-lbl2" x="425" y="365" font-size="12" fill="#333">K0</text>
-                            <text id="svg-ff0-type" x="435" y="340" font-size="10" fill="#666">JK-FF</text>
-                            <text x="475" y="315" font-size="12" fill="#333">Q</text>
-                            <text x="470" y="365" font-size="12" fill="#333">Q'</text>
-                            <polygon points="420,345 430,335 440,345" fill="none" stroke="#333" stroke-width="1" />
+                            <rect x="420" y="280" width="70" height="100" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="2" rx="4" />
+                            <text x="445" y="300" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
+                            <text id="svg-ff0-lbl1" x="425" y="315" font-size="12" font-weight="bold" fill="#d9534f">J0</text>
+                            <text id="svg-ff0-lbl2" x="425" y="365" font-size="12" font-weight="bold" fill="#d9534f">K0</text>
+                            <text id="svg-ff0-type" x="435" y="340" font-size="10" fill="var(--text-muted)" font-weight="bold">JK-FF</text>
+                            <text x="475" y="315" font-size="12" font-weight="bold" fill="var(--text-main)">Q</text>
+                            <text x="470" y="365" font-size="12" font-weight="bold" fill="var(--text-main)">Q'</text>
+                            <polygon points="420,345 430,335 440,345" fill="none" stroke="var(--svg-line)" stroke-width="1.5" />
                             
-                            <line x1="490" y1="310" x2="580" y2="310" stroke="#333" stroke-width="1.5"/>
+                            <line x1="490" y1="310" x2="580" y2="310" stroke="var(--svg-line)" stroke-width="2"/>
                             <use href="#dot" x="530" y="310" />
-                            <polyline points="530,310 530,25 110,25 110,35" fill="none" stroke="#333" stroke-width="1"/>
-                            <text x="585" y="315" font-size="12" fill="#333">Q0</text>
+                            <polyline points="530,310 530,25 110,25 110,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="4,4"/>
+                            <text x="585" y="315" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
 
-                            <line x1="490" y1="360" x2="540" y2="360" stroke="#333" stroke-width="1.5"/>
+                            <line x1="490" y1="360" x2="540" y2="360" stroke="var(--svg-line)" stroke-width="2"/>
                             <use href="#dot" x="540" y="360" />
-                            <polyline points="540,360 540,5 130,5 130,35" fill="none" stroke="#333" stroke-width="1"/>
+                            <polyline points="540,360 540,5 130,5 130,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="4,4"/>
 
-                            <polyline points="20,480 400,480 400,340 420,340" fill="none" stroke="#888" stroke-width="1.5" />
+                            <polyline points="20,480 400,480 400,340 420,340" fill="none" stroke="var(--text-muted)" stroke-width="2" />
                             <use href="#dot" x="400" y="480" />
-                            <polyline id="clk-ff1-line" points="400,480 400,160 420,160" fill="none" stroke="#888" stroke-width="1.5" />
-                            <text x="10" y="475" font-size="12" fill="#666">CLK</text>
+                            <polyline id="clk-ff1-line" points="400,480 400,160 420,160" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+                            <text x="10" y="475" font-size="12" font-weight="bold" fill="var(--text-muted)">CLK</text>
 
-                            <text id="lbl-out-Z" x="585" y="455" font-size="14" fill="#333">Z</text>
-                            <line x1="560" y1="450" x2="580" y2="450" stroke="#333" stroke-width="1.5"/>
+                            <text id="lbl-out-Z" x="585" y="455" font-size="16" font-weight="bold" fill="var(--text-main)">Z</text>
+                            <line x1="560" y1="450" x2="580" y2="450" stroke="var(--svg-line)" stroke-width="2"/>
                         </g>
 
                         <g id="dynamic-routing-layer"></g>
                     </g>
                 </svg>
             </div>
-            
-            <ul class="footer-note">
-                <li>Circuit diagram is generated based on simplified equations.</li>
-                <li>Click on components for more details.</li>
-            </ul>
         </div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // UI 互動 (平移縮放)
+    // UI 互動特效與工具列控制
     // ==========================================
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        triggerUpdate(); 
+    }
+
     const svgArea = document.getElementById('diagram-area');
     const svgGroup = document.getElementById('svg-pan-zoom');
     let scale = 1, panX = 0, panY = 0;
@@ -340,8 +380,34 @@
     window.addEventListener('mousemove', (e) => { if(isDragging) { panX = e.clientX - startX; panY = e.clientY - startY; applyTransform(); }});
     window.addEventListener('mouseup', () => { isDragging = false; });
 
+    function exportSVG() {
+        const svgElement = document.getElementById('circuit-svg');
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "Sequential_Circuit.svg";
+        link.click();
+    }
+
+    // Hover 聯動高亮 (指哪亮哪)
+    function highlightRoute(pin) {
+        const routes = document.querySelectorAll('.routed-element');
+        routes.forEach(el => el.classList.add('dimmed')); 
+        document.querySelectorAll('.route-' + pin).forEach(el => {
+            el.classList.remove('dimmed');
+            el.classList.add('glow'); 
+        });
+    }
+    function resetHighlight() {
+        document.querySelectorAll('.routed-element').forEach(el => {
+            el.classList.remove('dimmed');
+            el.classList.remove('glow');
+        });
+    }
+
     // ==========================================
-    // 系統資料流與事件綁定
+    // 系統狀態控制與事件綁定
     // ==========================================
     let kmapData = {};
     let currentKMapTab = '0A';
@@ -353,7 +419,14 @@
     document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
     
     document.getElementById('state-table').addEventListener('input', (e) => {
-        if (e.target.classList.contains('editable-cell')) triggerUpdate();
+        if (e.target.classList.contains('editable-cell')) {
+            const text = e.target.innerText.trim();
+            if (text.length > 1 || !/^[01A-Za-z]?$/.test(text)) {
+                e.target.classList.add('shake-error');
+                setTimeout(() => e.target.classList.remove('shake-error'), 400);
+            }
+            triggerUpdate();
+        }
     });
 
     function getTableData() {
@@ -376,13 +449,13 @@
         const thOut = document.getElementById('th-out');
         const outVar = document.getElementById('output-var').value || 'Z';
 
-        thOut.innerHTML = `<span class="dyn-out">${outVar}</span>`;
+        thOut.innerHTML = isMoore ? `<span class="dyn-out">${outVar}</span><br><span style="font-size:0.7em; color:var(--text-muted);">(State Only)</span>` : `<span class="dyn-out">${outVar}</span>`;
 
         let html = '';
         for(let i=0; i<data.length; i++) {
             html += `<tr><td class="editable-cell" contenteditable="true">${data[i].ps}</td><td class="editable-cell" contenteditable="true">${data[i].x}</td><td class="editable-cell" contenteditable="true">${data[i].ns}</td>`;
             if (isMoore) {
-                if (i % 2 === 0) html += `<td class="editable-cell" contenteditable="true" rowspan="2" style="vertical-align: middle;">${data[i].z}</td>`;
+                if (i % 2 === 0) html += `<td class="editable-cell z-cell" contenteditable="true" rowspan="2" style="vertical-align: middle;">${data[i].z}</td>`;
             } else {
                 html += `<td class="editable-cell" contenteditable="true">${data[i].z}</td>`;
             }
@@ -435,17 +508,9 @@
         document.querySelector('input[name="row_count"][value="6"]').checked = true;
         document.querySelector('input[name="ff_type"][value="jk"]').checked = true;
         document.querySelector('input[name="model"][value="mealy"]').checked = true;
-        
-        const data = [
-            {ps:'A', x:'0', ns:'A', z:'0'}, {ps:'A', x:'1', ns:'B', z:'0'},
-            {ps:'B', x:'0', ns:'C', z:'1'}, {ps:'B', x:'1', ns:'A', z:'0'},
-            {ps:'C', x:'0', ns:'A', z:'1'}, {ps:'C', x:'1', ns:'C', z:'1'}
-        ];
-        document.getElementById('input-var').value = 'X';
-        document.getElementById('output-var').value = 'Z';
-        
-        renderTableHTML(data);
-        triggerUpdate();
+        const data = [{ps:'A', x:'0', ns:'A', z:'0'}, {ps:'A', x:'1', ns:'B', z:'0'}, {ps:'B', x:'0', ns:'C', z:'1'}, {ps:'B', x:'1', ns:'A', z:'0'}, {ps:'C', x:'0', ns:'A', z:'1'}, {ps:'C', x:'1', ns:'C', z:'1'}];
+        document.getElementById('input-var').value = 'X'; document.getElementById('output-var').value = 'Z';
+        renderTableHTML(data); triggerUpdate();
     }
 
     function triggerUpdate() {
@@ -459,10 +524,12 @@
     // ==========================================
     function renderKMapTemplate(numVars, inVar) {
         const wrapper = document.getElementById('dynamic-kmap-wrapper');
+        const colorTitle = "color: var(--text-main); font-family: 'Fira Code', monospace;";
+        const colorLbl = "color: var(--text-muted); font-family: 'Fira Code', monospace;";
         if (numVars === 2) {
-            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="2" style="font-size:12px;">${inVar}</td></tr><tr><td style="font-size:12px;">0</td><td style="font-size:12px;">1</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:12px;">Q0</td><td style="font-size:12px;">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td></tr><tr><td style="font-size:12px;">1</td><td class="kmap-cell" id="kmap-2"></td><td class="kmap-cell" id="kmap-3"></td></tr></table>`;
+            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="2" style="font-size:13px; font-weight:800; ${colorTitle}">${inVar}</td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:13px; font-weight:800; ${colorTitle}">Q0</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td><td class="kmap-cell" id="kmap-2"></td><td class="kmap-cell" id="kmap-3"></td></tr></table>`;
         } else {
-            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="4" style="font-size:12px;">Q0 ${inVar}</td></tr><tr><td style="font-size:12px;">00</td><td style="font-size:12px;">01</td><td style="font-size:12px;">11</td><td style="font-size:12px;">10</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:12px;">Q1</td><td style="font-size:12px;">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td><td class="kmap-cell" id="kmap-3"></td><td class="kmap-cell" id="kmap-2"></td></tr><tr><td style="font-size:12px;">1</td><td class="kmap-cell" id="kmap-4"></td><td class="kmap-cell" id="kmap-5"></td><td class="kmap-cell" id="kmap-7"></td><td class="kmap-cell" id="kmap-6"></td></tr></table>`;
+            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="4" style="font-size:13px; font-weight:800; ${colorTitle}">Q0 ${inVar}</td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">00</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">01</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">11</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">10</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:13px; font-weight:800; ${colorTitle}">Q1</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td><td class="kmap-cell" id="kmap-3"></td><td class="kmap-cell" id="kmap-2"></td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td><td class="kmap-cell" id="kmap-4"></td><td class="kmap-cell" id="kmap-5"></td><td class="kmap-cell" id="kmap-7"></td><td class="kmap-cell" id="kmap-6"></td></tr></table>`;
         }
     }
 
@@ -475,16 +542,18 @@
         const data = kmapData[pin];
         if(!data) return;
 
-        document.getElementById('kmap-title-lbl').innerText = `${data.label}`;
+        document.getElementById('kmap-title-lbl').innerText = `${data.label} MAP`;
         let size = 1 << currentNumVars;
+        const isDark = document.body.classList.contains('dark-mode');
         for(let i=0; i<size; i++) {
             let el = document.getElementById('kmap-'+i);
             if(el) {
                 let val = data.array[i] || 'X';
                 el.innerText = val;
+                el.style.color = (val === 'X') ? 'var(--text-muted)' : (isDark ? '#ff6b6b' : '#d9534f');
             }
         }
-        document.getElementById('kmap-result').innerHTML = `(Simplified) ${data.label} = ${data.eq}`;
+        document.getElementById('kmap-result').innerHTML = `(Simplified) ${data.label} = <span class="var-text">${data.eq}</span>`;
     }
 
     // ==========================================
@@ -538,9 +607,14 @@
         
         document.getElementById('state-assign-lbl').innerText = sortedStates.map(s => `${s}=${stateMap[s].join('')}`).join(' , ') || '...';
 
+        /* ======= 修復 D/T 正反器幽靈跨行 Bug ======= */
         document.getElementById('row-ff1-1').style.display = (ffCount === 1) ? 'none' : 'table-row';
         document.getElementById('row-ff1-2').style.display = (ffCount === 1 || isSinglePin) ? 'none' : 'table-row';
         document.getElementById('row-ff0-2').style.display = isSinglePin ? 'none' : 'table-row';
+        
+        // Q0 與 Q1 的 rowspan 必須同步調整
+        let ff1Span = document.getElementById('cell-ff1-span');
+        if(ff1Span) ff1Span.rowSpan = isSinglePin ? 1 : 2;
         document.getElementById('cell-ff0-span').rowSpan = isSinglePin ? 1 : 2;
 
         document.getElementById('tab-1A').style.display = (ffCount === 1) ? 'none' : 'inline-block';
@@ -610,12 +684,11 @@
 
         renderKMapTemplate(currentNumVars, currentInVar);
         selectKMap(currentKMapTab);
+        
         drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, currentInVar, isSinglePin, lbl1A, lbl1B, lbl0A, lbl0B, ffCount);
     }
 
-    // ==========================================
     // Quine-McCluskey 窮舉化簡
-    // ==========================================
     function minimizeLogicExact(outputs, varName, numVars) {
         let ones = [], zeros = []; let maxVal = 1 << numVars;
         for(let i=0; i<maxVal; i++) { if(outputs[i] === '1') ones.push(i); else if(outputs[i] === '0') zeros.push(i); }
@@ -655,30 +728,31 @@
     }
 
     // ==========================================
-    // SVG 自動佈線繪製引擎 (採用極簡灰色系)
+    // SVG 自動佈線繪製引擎
     // ==========================================
     function drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, inVar, isSinglePin, l1A, l1B, l0A, l0B, ffCount) {
         let svg = '';
         const busMap = { [inVar]: 30, [inVar+"'"]: 50, "Q1": 70, "Q1'": 90, "Q0": 110, "Q0'": 130 };
-        const color = "#555"; // 統一用深灰色，還原老師的簡潔感
+        const color = "#999"; 
         
-        function drawSOP(equation, targetX, targetY, labelText) {
+        function drawSOP(equation, targetX, targetY, labelText, routeClass) {
             if (!equation) return ''; 
             let html = '';
-            
+            const baseClass = `routed-element route-${routeClass}`;
+
             if (equation === "0" || equation === "1") {
-                html += `<text x="${targetX - 25}" y="${targetY - 5}" font-size="12" fill="${color}">${equation}</text>`;
-                html += `<line class="animated-wire" x1="${targetX - 30}" y1="${targetY}" x2="${targetX}" y2="${targetY}" stroke="${color}"/>`;
+                html += `<text x="${targetX - 25}" y="${targetY - 5}" font-size="12" fill="${color}" class="${baseClass}">${equation}</text>`;
+                html += `<line class="animated-wire ${baseClass}" x1="${targetX - 30}" y1="${targetY}" x2="${targetX}" y2="${targetY}" stroke="${color}"/>`;
                 return html;
             }
             
             let terms = equation.split(' + '); let orX = targetX - 50; let andX = targetX - 130;
-            const drawWire = (x1, y1, x2, y2) => { let path = `M ${x1} ${y1}`; if (x1 !== x2 && y1 !== y2) { path += ` L ${x2} ${y1} L ${x2} ${y2}`; } else { path += ` L ${x2} ${y2}`; } return `<path d="${path}" class="animated-wire" stroke="${color}"/>`; };
-            const drawDot = (x, y) => `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}" class="animated-gate"/>`;
-            const gateAND = (x, y) => `<path d="M ${x-25} ${y-12} L ${x-5} ${y-12} A 12 12 0 0 1 ${x-5} ${y+12} L ${x-25} ${y+12} Z" fill="white" stroke="${color}" stroke-width="1.5" class="animated-gate"/>`;
-            const gateOR = (x, y) => `<path d="M ${x-25} ${y-15} Q ${x-10} ${y-15} ${x} ${y} Q ${x-10} ${y+15} ${x-25} ${y+15} Q ${x-15} ${y} ${x-25} ${y-15} Z" fill="white" stroke="${color}" stroke-width="1.5" class="animated-gate"/>`;
+            const drawWire = (x1, y1, x2, y2) => { let path = `M ${x1} ${y1}`; if (x1 !== x2 && y1 !== y2) { path += ` L ${x2} ${y1} L ${x2} ${y2}`; } else { path += ` L ${x2} ${y2}`; } return `<path d="${path}" class="animated-wire ${baseClass}" stroke="${color}"/>`; };
+            const drawDot = (x, y) => `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}" class="animated-gate ${baseClass}"/>`;
+            const gateAND = (x, y) => `<path d="M ${x-25} ${y-12} L ${x-5} ${y-12} A 12 12 0 0 1 ${x-5} ${y+12} L ${x-25} ${y+12} Z" fill="var(--svg-bg)" stroke="${color}" stroke-width="1.5" class="animated-gate ${baseClass}"/>`;
+            const gateOR = (x, y) => `<path d="M ${x-25} ${y-15} Q ${x-10} ${y-15} ${x} ${y} Q ${x-10} ${y+15} ${x-25} ${y+15} Q ${x-15} ${y} ${x-25} ${y-15} Z" fill="var(--svg-bg)" stroke="${color}" stroke-width="1.5" class="animated-gate ${baseClass}"/>`;
             
-            html += `<text x="${targetX - 30}" y="${targetY - 15}" class="highlight-lbl animated-gate" fill="${color}">${labelText}=${equation}</text>`;
+            html += `<text x="${targetX - 30}" y="${targetY - 15}" class="highlight-lbl animated-gate ${baseClass}" fill="${color}">${labelText}=${equation}</text>`;
             
             if (terms.length === 1) { 
                 let vars = terms[0].split(' · ');
@@ -688,32 +762,30 @@
                 html += gateOR(orX, targetY); html += drawWire(orX, targetY, targetX, targetY);
                 terms.forEach((term, i) => {
                     let termY = targetY + (i === 0 ? -25 : 25); let orInY = targetY + (i === 0 ? -8 : 8); let vars = term.split(' · ');
-                    if (vars.length === 1) { html += drawWire(busMap[vars[0]], termY, orX - 20, termY); html += `<path d="M ${orX-20} ${termY} L ${orX-20} ${orInY}" class="animated-wire" stroke="${color}"/>`; html += drawDot(busMap[vars[0]], termY); } 
-                    else { html += gateAND(andX, termY); html += `<path d="M ${andX} ${termY} L ${andX+15} ${termY} L ${andX+15} ${orInY} L ${orX-20} ${orInY}" class="animated-wire" stroke="${color}"/>`; vars.forEach((v, vi) => { let inY = termY + (vi === 0 ? -6 : 6); html += drawWire(busMap[v], inY, andX - 25, inY); html += drawDot(busMap[v], inY); }); }
+                    if (vars.length === 1) { html += drawWire(busMap[vars[0]], termY, orX - 20, termY); html += `<path d="M ${orX-20} ${termY} L ${orX-20} ${orInY}" class="animated-wire ${baseClass}" stroke="${color}"/>`; html += drawDot(busMap[vars[0]], termY); } 
+                    else { html += gateAND(andX, termY); html += `<path d="M ${andX} ${termY} L ${andX+15} ${termY} L ${andX+15} ${orInY} L ${orX-20} ${orInY}" class="animated-wire ${baseClass}" stroke="${color}"/>`; vars.forEach((v, vi) => { let inY = termY + (vi === 0 ? -6 : 6); html += drawWire(busMap[v], inY, andX - 25, inY); html += drawDot(busMap[v], inY); }); }
                 });
             } return html;
         }
         
         if (ffCount > 1) {
             const y1A = isSinglePin ? 155 : 130;
-            svg += drawSOP(eq1A, 420, y1A, l1A); 
-            if(!isSinglePin) svg += drawSOP(eq1B, 420, 180, l1B);
+            svg += drawSOP(eq1A, 420, y1A, l1A, '1A'); 
+            if(!isSinglePin) svg += drawSOP(eq1B, 420, 180, l1B, '1B');
         }
         const y0A = isSinglePin ? 335 : 310;
-        svg += drawSOP(eq0A, 420, y0A, l0A); 
-        if(!isSinglePin) svg += drawSOP(eq0B, 420, 360, l0B);
+        svg += drawSOP(eq0A, 420, y0A, l0A, '0A'); 
+        if(!isSinglePin) svg += drawSOP(eq0B, 420, 360, l0B, '0B');
         
-        svg += drawSOP(eqZ,  560, 450, 'Z');
+        svg += drawSOP(eqZ,  560, 450, 'Z', 'Z');
         
         document.getElementById('dynamic-routing-layer').innerHTML = svg;
     }
 
-    // 啟動系統
     window.onload = () => {
         updateRowCount();
         loadExample();
     };
 </script>
-
 </body>
 </html>
