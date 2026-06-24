@@ -6,786 +6,1541 @@
     <title>Final Project - 1140511 黃盼盼</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* ================= 系統色彩變數 (支援深淺色模式) ================= */
         :root {
+            --primary: #005088;
             --bg-body: #eef2f5;
             --bg-panel: #ffffff;
             --text-main: #333333;
             --text-muted: #666666;
-            --border-color: #cccccc;
-            --shadow-soft: 0 4px 10px rgba(0,0,0,0.05);
-            --header-bg: #6c757d;
-            --header-text: #ffffff;
-            --table-th: #f9f9f9;
-            --svg-line: #333333;
-            --svg-bg: #ffffff;
-            --grid-color: #eeeeee;
+            --accent-red: #d9534f;
+            --accent-blue: #5bc0de;
+            --accent-green: #5cb85c;
+            --accent-yellow: #f0ad4e;
+            --accent-purple: #9b59b6;
+            --border-color: #dddddd;
         }
-
         body.dark-mode {
             --bg-body: #121212;
             --bg-panel: #1e1e1e;
             --text-main: #f8f9fa;
             --text-muted: #adb5bd;
             --border-color: #444444;
-            --shadow-soft: 0 10px 25px rgba(0,0,0,0.5);
-            --header-bg: #000000;
-            --header-text: #5bc0de;
-            --table-th: #2b2b2b;
-            --svg-line: #f8f9fa;
-            --svg-bg: #1e1e1e;
-            --grid-color: #2a2a2a;
+            --accent-blue: #48cae4;
+            --accent-red: #ff6b6b;
+            --accent-green: #81b29a;
+            --accent-purple: #c39bd3;
         }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            margin: 0; 
+            height: 100vh; 
+            overflow: hidden; 
+            color: var(--text-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .app-wrapper { display: flex; height: 100vh; width: 100vw; }
+        .control-panel {
+            width: 45%; height: 100%; overflow-y: auto; padding: 20px;
+            box-sizing: border-box; border-right: 2px solid var(--border-color);
+            background: var(--bg-body);
+            transition: background-color 0.3s ease;
+        }
+        .visual-panel {
+            width: 55%; height: 100%; display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box; background: var(--bg-body);
+            gap: 15px; overflow-y: auto;
+            transition: background-color 0.3s ease;
+        }
+        .main-title { 
+            font-family: 'Times New Roman', serif; font-size: 30px; 
+            margin: 0; color: var(--text-muted);
+        }
+        .section-box {
+            background: var(--bg-panel); border-radius: 6px; border: 1px solid var(--border-color);
+            padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); position: relative;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .box-title {
+            font-weight: 800; font-size: 14px; text-transform: uppercase;
+            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .usage-guide {
+            background-color: rgba(91, 192, 222, 0.1); border-left: 5px solid var(--accent-blue); 
+            padding: 12px 15px; margin-bottom: 15px; border-radius: 4px; 
+            font-size: 13px; line-height: 1.5; color: var(--text-main);
+        }
+        table.data-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; margin-bottom: 5px; }
+        table.data-table th, table.data-table td { border: 1px solid var(--border-color); padding: 6px; }
+        table.data-table th { background: rgba(0,0,0,0.02); font-weight: 700; }
+        
+        /* 🔥 自訂狀態名稱可編輯樣式 */
+        .editable-cell {
+            cursor: text; font-weight: 800; color: var(--primary);
+            text-transform: uppercase; transition: all 0.2s ease;
+        }
+        .editable-cell:hover { background-color: rgba(91,192,222,0.1); border-radius: 4px; }
+        .editable-cell:focus { outline: 2px solid var(--accent-blue); background-color: var(--bg-panel); border-radius: 4px;}
+        body.dark-mode .editable-cell { color: var(--accent-blue); }
 
-        /* ================= 極簡學術風全域排版 ================= */
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: var(--bg-body); margin: 0; padding: 20px; color: var(--text-main); transition: 0.3s; }
-        
-        .main-title { font-family: 'Times New Roman', Times, serif; font-size: 2.5em; color: var(--text-muted); font-weight: normal; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-top: 0; margin-bottom: 10px; display: flex; align-items: baseline; gap: 15px; transition: 0.3s;}
-        .main-title span { font-family: 'Segoe UI', sans-serif; font-size: 0.35em; color: var(--text-muted); font-weight: bold; }
-
-        .header { background-color: var(--header-bg); color: var(--header-text); padding: 8px 15px; font-size: 1.1em; font-weight: 600; border-top-left-radius: 4px; border-top-right-radius: 4px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;}
-        
-        .theme-toggle { background: transparent; border: 1px solid var(--header-text); color: var(--header-text); padding: 2px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;}
-        .theme-toggle:hover { background: var(--header-text); color: var(--header-bg); }
-
-        .container { display: flex; flex-wrap: wrap; gap: 10px; background-color: var(--bg-panel); padding: 10px; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; box-shadow: var(--shadow-soft); min-height: 80vh; transition: 0.3s;}
-        
-        /* ================= 系統說明面板 (Quick Start Guide) ================= */
-        .usage-guide { width: 100%; box-sizing: border-box; background-color: #e8f4f8; border-left: 5px solid #5bc0de; padding: 12px 20px; margin-bottom: 5px; border-radius: 2px; color: #333; font-size: 0.95em; line-height: 1.6; }
-        .usage-guide strong { color: #5bc0de; }
-        .usage-guide ul { margin: 5px 0 0 0; padding-left: 25px; }
-        .usage-guide .highlight-text { color: #d9534f; font-weight: bold; background: rgba(217,83,79,0.1); padding: 2px 6px; border-radius: 4px; }
-        .dark-mode .usage-guide { background-color: #2a363b; border-color: #48cae4; color: #f8f9fa; }
-        .dark-mode .usage-guide strong { color: #48cae4; }
-        .dark-mode .usage-guide .highlight-text { color: #ff6b6b; background: rgba(255,107,107,0.2); }
-
-        /* ================= 三大區塊邊框設計 ================= */
-        .col { padding: 12px; background-color: rgba(0,0,0,0.02); border-radius: 2px; }
-        .col-1 { flex: 1; min-width: 280px; border: 2px solid #d9534f; }
-        .col-1 .section-title { color: #d9534f; }
-        .col-2 { flex: 1.2; min-width: 320px; border: 2px solid #5bc0de; display: flex; flex-direction: column; gap: 10px; }
-        .col-2 .section-title { color: #5bc0de; }
-        .col-2 .box { border: 1px solid #5bc0de; }
-        .col-3 { flex: 2.2; min-width: 450px; border: 2px solid #5cb85c; display: flex; flex-direction: column; position: relative;}
-        .col-3 .section-title { color: #5cb85c; }
-        
-        /* ================= 內部區塊與表格 ================= */
-        .section-title { font-size: 0.9em; font-weight: bold; margin: 0 0 8px 0; text-transform: uppercase; }
-        .box { border: 1px solid var(--border-color); padding: 12px; margin-bottom: 12px; background-color: var(--bg-panel); border-radius: 2px; transition: 0.3s;}
-        
-        table.data-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.85em; table-layout: fixed; background: var(--bg-panel);}
-        table.data-table th, table.data-table td { border: 1px solid var(--border-color); padding: 6px; color: var(--text-main); }
-        table.data-table th { background-color: var(--table-th); }
-        
-        .editable-cell { cursor: text; transition: all 0.2s; outline: none; font-family: 'Fira Code', monospace; color: #d9534f; font-weight: bold;}
-        .dark-mode .editable-cell { color: #ff6b6b; }
-        .editable-cell:hover { background-color: rgba(0,0,0,0.05); }
-        .editable-cell:focus { background-color: rgba(91,192,222,0.1); box-shadow: inset 0 0 0 1px #5bc0de; }
-        
-        .var-input { width: 80%; padding: 4px; border: 1px solid var(--border-color); border-radius: 2px; font-weight: bold; text-align: center; color: #5bc0de; font-size: 0.9em; font-family: 'Fira Code', monospace; background: transparent;}
-        
-        /* ================= 按鈕與選項 ================= */
-        .radio-group { margin-bottom: 4px; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 10px; color: var(--text-muted); }
-        .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        button.action-btn { flex: 1; padding: 6px 10px; border: 1px solid var(--border-color); background-color: var(--table-th); cursor: pointer; border-radius: 2px; font-size: 0.85em; color: var(--text-main); transition: 0.2s; font-weight: bold;}
+        .table-select { 
+            width: 100%; border: 1px solid var(--border-color); border-radius: 4px; 
+            font-family: 'Fira Code', monospace; font-weight: bold; padding: 3px; cursor: pointer;
+            color: var(--accent-red); outline: none; transition: 0.2s; background: var(--bg-panel);
+        }
+        .table-select:hover { background-color: rgba(91,192,222,0.1); }
+        .z-select { color: var(--accent-green); }
+        .var-input { width: 70%; padding: 4px; border: 1px solid var(--border-color); border-radius: 2px; font-weight: bold; text-align: center; color: var(--accent-blue); font-size: 13px; font-family: 'Fira Code', monospace; background: transparent; outline:none;}
+        .eq-scroll-box { max-width: 100%; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; text-align: left; padding-left: 5px; padding-bottom: 2px;}
+        .var-text { font-family: 'Fira Code', monospace; font-weight: bold; color: var(--accent-red); font-size: 13px; }
+        .formula-container { background: rgba(0,0,0,0.02); padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 10px; border: 1px dashed var(--border-color); text-align: center; white-space: nowrap; }
+        button.action-btn { flex: 1; padding: 6px 12px; border: 1px solid var(--border-color); background: var(--bg-panel); cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; font-size: 12px; color: var(--text-main);}
         button.action-btn:hover { filter: brightness(0.9); }
-
-        /* ================= 卡諾圖 (K-Map) ================= */
-        .kmap-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; }
-        .kmap-tabs button { padding: 4px 12px; border: 1px solid #5bc0de; background: var(--bg-panel); color: #5bc0de; font-size: 0.8em; border-radius: 2px; cursor: pointer; font-weight: bold;}
-        .kmap-tabs button.active { background: #5bc0de; color: white;}
-        .kmap-container { margin: 5px auto; display: flex; justify-content: center; align-items: center; min-height: 100px;}
+        .theme-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 12px;}
+        .theme-toggle:hover { background: rgba(0,0,0,0.05); }
+        .svg-toolbar button { padding: 2px 8px; font-size: 12px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); cursor: pointer; border-radius: 3px; font-weight: bold;}
+        .svg-toolbar button:hover { background: rgba(0,0,0,0.05); }
+        .kmap-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .kmap-tabs button { padding: 4px 12px; border: 1px solid var(--accent-blue); background: var(--bg-panel); color: var(--accent-blue); font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .kmap-tabs button.active { background: var(--accent-blue); color: white; }
         .kmap-table { border-collapse: collapse; text-align: center; font-size: 13px; margin: 0 auto; background: var(--bg-panel);}
-        .kmap-table td { padding: 2px 6px; border: none; color: var(--text-main); font-family: 'Fira Code', monospace;}
-        .kmap-table .kmap-cell { border: 1px solid var(--text-muted) !important; width: 35px; height: 35px; font-weight: bold; color: #d9534f; font-size: 1.1em;}
-        .dark-mode .kmap-table .kmap-cell { color: #ff6b6b; border-color: #666 !important;}
-        
-        /* ================= 電路圖區域與工具列 ================= */
-        .svg-toolbar { position: absolute; right: 15px; top: 10px; display: flex; gap: 5px; z-index: 10; }
-        .svg-toolbar button { padding: 2px 6px; font-size: 1.1em; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); cursor: pointer; border-radius: 2px;}
-        .svg-toolbar button:hover { background: var(--table-th); }
-
-        .diagram-area { flex: 1; width: 100%; min-height: 500px; background-color: var(--svg-bg); position: relative; overflow: hidden; border: 1px solid var(--border-color); cursor: grab; transition: 0.3s;}
-        .diagram-area:active { cursor: grabbing; }
-        
-        /* 讓方程式不會被斷行擠成一坨 */
-        .var-text { font-family: 'Fira Code', monospace; color: #d9534f; white-space: nowrap; }
-        .dark-mode .var-text { color: #ff6b6b; }
-
-        .animated-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: flow 0.6s linear infinite; transition: opacity 0.3s, filter 0.3s, stroke-width 0.3s;}
-        @keyframes flow { from { stroke-dashoffset: 10; } to { stroke-dashoffset: 0; } }
-        .animated-gate { animation: popIn 0.3s ease-out forwards; opacity: 0; transform-origin: center; transition: opacity 0.3s, filter 0.3s;}
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        
-        /* ================= 修正的 Hover 發光特效 ================= */
-        .eq-row { cursor: pointer; transition: background 0.2s; }
+        .kmap-table td { padding: 4px 8px; border: none; font-family: 'Fira Code', monospace;}
+        .kmap-cell { border: 1px solid var(--border-color) !important; width: 35px; height: 35px; font-weight: bold; color: var(--accent-red); font-size: 14px;}
+        .kmap-diag-cell { position: relative; width: 60px; height: 40px; border-bottom: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
+        .kmap-svg-diag { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .kmap-lbl-left { position: absolute; bottom: 2px; left: 4px; font-size: 10px; font-weight: bold; color: var(--text-muted); }
+        .kmap-lbl-right { position: absolute; top: 2px; right: 2px; font-size: 10px; font-weight: bold; color: var(--text-muted); }
+        .eq-row { cursor: pointer; transition: 0.2s; }
         .eq-row:hover { background-color: rgba(91,192,222,0.1) !important; }
-        
-        .dimmed { opacity: 0.15 !important; }
-        
-        /* 線條與邏輯閘路徑變粗、變色發光 */
-        path.glow, line.glow, polyline.glow { 
-            stroke-width: 3.5 !important; 
-            stroke: #d9534f !important; 
-            filter: drop-shadow(0 0 3px #d9534f); 
-            opacity: 1 !important;
-        }
-        /* 邏輯閘上的小圓點變色發光 */
-        circle.glow { 
-            fill: #d9534f !important; 
-            filter: drop-shadow(0 0 3px #d9534f); 
-            opacity: 1 !important;
-        }
-        /* 文字絕對不能變粗，只改變字體顏色與粗細 */
-        text.glow { 
-            fill: #d9534f !important; 
-            stroke: none !important; 
-            stroke-width: 0 !important; 
-            font-weight: 900 !important; 
-            opacity: 1 !important; 
-            filter: drop-shadow(0 0 2px rgba(217,83,79,0.5));
-        }
-
-        .highlight-lbl { font-family: 'Fira Code', monospace; font-size: 11px; fill: var(--text-muted); }
-        
-        /* 同步防呆提示 */
+        .dimmed { opacity: 0.1 !important; }
+        path.glow, line.glow, polyline.glow { stroke-width: 3.5 !important; stroke: var(--accent-red) !important; filter: drop-shadow(0 0 3px var(--accent-red)); opacity: 1 !important; }
+        circle.glow { fill: var(--accent-red) !important; filter: drop-shadow(0 0 3px var(--accent-red)); opacity: 1 !important; }
+        text.glow { fill: var(--accent-red) !important; stroke: none !important; stroke-width: 0 !important; font-weight: 900 !important; opacity: 1 !important; filter: drop-shadow(0 0 2px rgba(217,83,79,0.5));}
+        .animated-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 6 4; animation: flow 0.6s linear infinite; transition: opacity 0.3s, stroke-width 0.3s;}
+        @keyframes flow { from { stroke-dashoffset: 10; } to { stroke-dashoffset: 0; } }
+        .animated-gate { animation: popIn 0.3s ease-out forwards; opacity: 0; transform-origin: center; transition: opacity 0.3s;}
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
         .sync-flash { animation: flashGrey 0.4s ease-out; }
-        @keyframes flashGrey { 0% { background-color: #ffeb3b; color: black; } 100% { background-color: transparent; } }
-        .shake-error { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; background-color: rgba(217, 83, 79, 0.2) !important; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        @keyframes flashGrey { 0% { background-color: #ffeb3b; } 100% { background-color: transparent; } }
+        
+        .sim-glow { stroke: var(--accent-purple) !important; stroke-width: 6px !important; filter: drop-shadow(0 0 12px var(--accent-purple)) !important; transition: all 0.3s ease-in-out; }
+        .sim-edge-glow { stroke: var(--accent-purple) !important; stroke-width: 5px !important; filter: drop-shadow(0 0 8px var(--accent-purple)) !important; transition: all 0.3s ease-in-out; }
+        .sim-step-box { display: flex; flex-direction: column; align-items: center; background: var(--bg-panel); border: 2px solid var(--border-color); padding: 6px 12px; border-radius: 6px; min-width: 60px; font-weight: bold; animation: popIn 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .sim-step-box.active-step { border-color: var(--accent-purple); box-shadow: 0 0 8px rgba(155,89,182,0.5); }
 
+        .svg-text-main { fill: var(--text-main); }
+        .svg-text-muted { fill: var(--text-muted); }
+        .svg-stroke-main { stroke: var(--text-main); }
+        .svg-stroke-muted { stroke: var(--border-color); }
+        .canvas-container { flex: 1.5; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 500px; }
+        .state-diagram-container { flex: 1; position: relative; display: flex; flex-direction: column; min-height: 300px; max-height: 350px;}
+
+        /* 新手導覽彈窗 (Welcome Overlay) */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 1; transition: opacity 0.4s ease;
+        }
+        .tour-modal {
+            background: var(--bg-panel); width: 450px; border-radius: 12px;
+            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(0); transition: transform 0.4s ease;
+            color: var(--text-main); text-align: center;
+        }
+        .tour-modal h2 { margin-top: 0; color: var(--primary); font-size: 24px; }
+        .tour-modal p { color: var(--text-muted); line-height: 1.6; font-size: 15px; margin-bottom: 20px;}
+        .tour-step { background: var(--bg-body); padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: left; font-size: 14px; font-weight: 600; border-left: 4px solid var(--accent-blue);}
+        .tour-btn { background: var(--primary); color: white; border: none; padding: 10px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; margin-top: 15px;}
+        .tour-btn:hover { background: #003d66; transform: scale(1.05); }
+        .hidden { opacity: 0; pointer-events: none; transform: translateY(-20px); }
+
+        /* Toast 提示通知 */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: #2c3e50; color: #fff; padding: 12px 24px; border-radius: 30px;
+            font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: slideDownFade 0.3s ease forwards, slideUpFadeOut 0.3s ease 2.2s forwards;
+        }
+        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+        /* 波形圖分析儀樣式 */
+        .waveform-container {
+            background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); 
+            border-radius: 8px; padding: 10px; overflow-x: auto; margin-top: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03); scrollbar-width: thin;
+        }
     </style>
 </head>
 <body>
 
-<div style="max-width: 1350px; margin: 0 auto;">
-    <h1 class="main-title">
-        Final Project 
-        <span>1140511 黃盼盼</span>
-    </h1>
-    
-    <div class="header">
-        <span>⚙ Sequential Circuit Design Automation System</span>
-        <div>
-            <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+<div class="overlay" id="welcome-overlay">
+    <div class="tour-modal" id="tour-modal">
+        <h2>🚀 歡迎使用邏輯電路 EDA</h2>
+        <p>這是一個專業級的 Sequential Circuit 自動化設計與分析工具。只需三個步驟，輕鬆完成設計！</p>
+        <div class="tour-step" style="border-left-color: var(--accent-red);">
+            ⚙️ Step 1. 設定模型與 <b>自訂狀態編碼</b> (Binary/Gray Code)。
         </div>
+        <div class="tour-step" style="border-left-color: var(--accent-blue);">
+            📊 Step 2. <b>直接點擊表格內的「A, B, C」</b>，可以隨意更改為 IDLE, EXEC 等自訂狀態名稱！
+        </div>
+        <div class="tour-step" style="border-left-color: var(--accent-purple);">
+            ✨ Step 3. 觀看即時電路與狀態圖，底部還能 <b>動態跑馬燈模擬</b> 並匯出硬體碼！
+        </div>
+        <button class="tour-btn" onclick="closeTour()">開始使用 (Let's Go!)</button>
     </div>
+</div>
 
-    <div class="container">
+<div id="toast-container"></div>
+
+<div class="app-wrapper">
+    <!-- 加入 ID: left-panel -->
+    <div class="control-panel" id="left-panel">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: baseline; gap: 12px;">
+                <h1 class="main-title">Sequential Circuit EDA</h1>
+                <span style="font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 3px;">1140511 黃盼盼</span>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme(); showToast('🌓 已切換色彩模式')">🌙 Dark Mode</button>
+        </div>
         <div class="usage-guide">
-            <strong>💡 系統操作指南 (Quick Start Guide)：</strong>
-            <ul>
-                <li><strong>設定系統 (Setup)：</strong>於左側面板選擇 Mealy/Moore 模型、正反器種類 (JK/SR/D/T) 以及狀態表大小。</li>
-                <li><strong>輸入狀態表 (State Table)：</strong>在表格中直接修改 <code>0</code> 或 <code>1</code>，系統將在背景即時利用 Q-M 演算法運算。</li>
-                <li><strong>動態電路圖互動 (Live Schematic)：</strong>右側將自動由 SVG 引擎繪製電路。 <span class="highlight-text">將滑鼠游標停留在「Equations 方程式表格」上，可發光追蹤電路圖中對應的獨立線路！</span></li>
-            </ul>
+            <strong>💡 操作說明：</strong>
+            可以直接點擊狀態表名稱修改。右側電路圖需按住 <b>Ctrl + 滾輪</b> 進行縮放，中間分隔線可 <b>左右拖曳</b> 調整大小喔！
         </div>
-
-        <div class="col col-1">
-            <div class="box" style="border:none; padding:0; margin-bottom:15px; background:transparent;">
-                <div class="section-title">1. MODEL TYPE</div>
-                <div class="radio-group" style="margin-bottom: 15px;">
-                    <label><input type="radio" name="model" value="mealy" checked onchange="triggerUpdate()"> Mealy Model</label>
-                    <label><input type="radio" name="model" value="moore" onchange="triggerUpdate()"> Moore Model</label>
+        <div class="section-box" style="border-top: 4px solid var(--accent-red);">
+            <div class="box-title" style="color: var(--accent-red);">⚙ 1. System Setup</div>
+            <div style="display: flex; gap: 20px; font-size: 13px; font-weight: 600; margin-bottom: 10px; flex-wrap: wrap;">
+                <div>模型：
+                    <input type="radio" name="model" value="mealy" checked onchange="triggerUpdate()"> Mealy
+                    <input type="radio" name="model" value="moore" onchange="triggerUpdate()"> Moore
                 </div>
-
-                <div class="section-title">2. FLIP-FLOP TYPE</div>
-                <div class="radio-group" style="margin-bottom: 15px;">
-                    <label><input type="radio" name="ff_type" value="jk" checked onchange="triggerUpdate()"> JK-FF</label>
-                    <label><input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR-FF</label>
-                    <label><input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D-FF</label>
-                    <label><input type="radio" name="ff_type" value="t" onchange="triggerUpdate()"> T-FF</label>
-                </div>
-
-                <div class="section-title">3. TABLE SIZE</div>
-                <div class="radio-group" style="margin-bottom: 15px;">
-                    <label><input type="radio" name="row_count" value="4" onchange="updateRowCount()"> 4 Rows</label>
-                    <label><input type="radio" name="row_count" value="6" checked onchange="updateRowCount()"> 6 Rows</label>
-                    <label><input type="radio" name="row_count" value="8" onchange="updateRowCount()"> 8 Rows</label>
+                <div>FF：
+                    <input type="radio" name="ff_type" value="jk" onchange="triggerUpdate()"> JK
+                    <input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR
+                    <input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D
+                    <input type="radio" name="ff_type" value="t" checked onchange="triggerUpdate()"> T
                 </div>
             </div>
-
-            <div class="box" style="border:none; padding:0; background:transparent;">
-                <div class="section-title">4. STATE TABLE INPUT</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <div style="flex:1;"><label style="font-size: 0.8em;">Input Variables</label><br><input type="text" id="input-var" class="var-input" value="X" maxlength="1" oninput="triggerUpdate()"></div>
-                    <div style="flex:1;"><label style="font-size: 0.8em;">Output Variation</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1" oninput="triggerUpdate()"></div>
+            <div style="display: flex; gap: 20px; font-size: 13px; font-weight: 600; flex-wrap: wrap;">
+                <div>大小：
+                    <input type="radio" name="row_count" value="4" onchange="updateRowCount()"> 4 Rows
+                    <input type="radio" name="row_count" value="6" checked onchange="updateRowCount()"> 6 Rows
+                    <input type="radio" name="row_count" value="8" onchange="updateRowCount()"> 8 Rows
                 </div>
-                
-                <div style="font-size: 0.8em; color: #5bc0de; font-weight: bold; margin-bottom: 5px; font-family: 'Fira Code', monospace;">
-                    Assign: <span id="state-assign-lbl" style="color: var(--text-muted);">...</span>
-                </div>
-                
-                <table class="data-table" id="state-table" style="margin-top: 5px;">
-                    <thead><tr><th>State</th><th><span class="dyn-in">X</span></th><th>Next</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
-                    <tbody></tbody>
-                </table>
-                <div class="btn-group">
-                    <button class="action-btn" onclick="clearTable()">Clear</button>
-                    <button class="action-btn" onclick="loadExample()">Reset</button>
+                <div style="color: var(--accent-purple);">編碼：
+                    <input type="radio" name="encoding" value="binary" checked onchange="triggerUpdate(); showToast('已套用 Binary 狀態編碼')"> Binary
+                    <input type="radio" name="encoding" value="gray" onchange="triggerUpdate(); showToast('已套用 Gray Code 狀態編碼')"> Gray Code
                 </div>
             </div>
         </div>
-
-        <div class="col col-2">
-            <div class="box" style="margin-bottom: 0;">
-                <div class="section-title">OUTPUT 1: EQUATIONS</div>
-                <p style="font-size: 0.8em; text-align: center; margin: 5px 0;">(Hover to Inspect Route)</p>
-                <table class="data-table">
-                    <tr><th>FF</th><th>Pin</th><th>Equation</th></tr>
-                    <tr id="row-ff1-1" class="eq-row" onmouseenter="highlightRoute('1A')" onmouseleave="resetHighlight()">
-                        <td rowspan="2" id="cell-ff1-span" style="font-weight:bold;">Q1</td>
-                        <td id="lbl-eq-1A" style="font-weight: bold; color:#d9534f;">J1</td><td id="eq-1A" class="var-text">...</td>
-                    </tr>
-                    <tr id="row-ff1-2" class="eq-row" onmouseenter="highlightRoute('1B')" onmouseleave="resetHighlight()">
-                        <td id="lbl-eq-1B" style="font-weight: bold; color:#d9534f;">K1</td><td id="eq-1B" class="var-text">...</td>
-                    </tr>
-                    <tr id="row-ff0-1" class="eq-row" onmouseenter="highlightRoute('0A')" onmouseleave="resetHighlight()">
-                        <td rowspan="2" id="cell-ff0-span" style="font-weight:bold;">Q0</td>
-                        <td id="lbl-eq-0A" style="font-weight: bold; color:#d9534f;">J0</td><td id="eq-0A" class="var-text">...</td>
-                    </tr>
-                    <tr id="row-ff0-2" class="eq-row" onmouseenter="highlightRoute('0B')" onmouseleave="resetHighlight()">
-                        <td id="lbl-eq-0B" style="font-weight: bold; color:#d9534f;">K0</td><td id="eq-0B" class="var-text">...</td>
-                    </tr>
-                    <tr class="eq-row" onmouseenter="highlightRoute('Z')" onmouseleave="resetHighlight()">
-                        <td colspan="2" style="font-weight:bold;">Output</td><td id="eq-z" class="var-text">...</td>
-                    </tr>
-                </table>
+        <div class="section-box" style="border-top: 4px solid var(--accent-blue);">
+            <div class="box-title" style="color: var(--accent-blue);">📊 2. State Table & Variables</div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Input Var</label><br><input type="text" id="input-var" class="var-input" value="X" maxlength="1" oninput="triggerUpdate()"></div>
+                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Output Var</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1" oninput="triggerUpdate()"></div>
             </div>
-
-            <div class="box" style="flex: 1; display: flex; flex-direction: column;">
-                <div class="section-title">K-MAP VIEWER</div>
-                <div class="kmap-tabs" id="kmap-tab-container">
-                    <button id="tab-1A" onclick="selectKMap('1A')">J1</button>
-                    <button id="tab-1B" onclick="selectKMap('1B')">K1</button>
-                    <button id="tab-0A" onclick="selectKMap('0A')" class="active">J0</button>
-                    <button id="tab-0B" onclick="selectKMap('0B')">K0</button>
-                    <button id="tab-Z" onclick="selectKMap('Z')">Z</button>
-                </div>
-                <p id="kmap-title-lbl" style="font-size: 0.85em; margin: 0; color: var(--text-muted); text-align: center; font-family: 'Fira Code', monospace; font-weight: bold;">Map</p>
-                <div class="kmap-container" id="dynamic-kmap-wrapper"></div>
-                <p id="kmap-result" style="text-align: center; font-size: 0.9em; margin-top: auto; color: var(--text-main); font-weight: bold; font-family: 'Fira Code', monospace;">...</p>
+            <div style="font-size: 12px; color: var(--accent-purple); font-family: 'Fira Code', monospace; margin-bottom: 8px; font-weight: bold;" id="state-assign-lbl">...</div>
+            <table class="data-table" id="state-table">
+                <thead><tr><th>Present</th><th><span class="dyn-in">X</span></th><th>Next State</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="action-btn" onclick="clearTable(); showToast('🗑️ 表格已清空')">Clear Table</button>
+                <button class="action-btn" onclick="loadExample(); showToast('🔄 已重置預設範例')">Reset Example</button>
+                <button class="action-btn" style="border-color: var(--accent-purple); color: var(--accent-purple);" onclick="loadPresetMoore(); showToast('💡 已帶入：2位元向上計數器範例')">2-Bit Counter</button>
+            </div>
+        </div>
+        <div class="section-box" style="border-top: 4px solid var(--accent-green);">
+            <div class="box-title" style="color: var(--accent-green);">
+                <span>🧮 3. Equations (Hover to Trace)</span>
+                <button onclick="exportVerilog()" style="background: #2b3035; color: #4af626; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-family: monospace; font-weight: bold; font-size: 11px;">&lt;/&gt; 匯出 Verilog</button>
+            </div>
+            <table class="data-table" style="table-layout: fixed; text-align: left; margin: 0;">
+                <colgroup><col style="width:15%;"><col style="width:15%;"><col style="width:70%;"></colgroup>
+                <tr><th style="text-align:center;">FF</th><th style="text-align:center;">Pin</th><th style="padding-left:10px;">Equation</th></tr>
+                <tr id="row-ff1-1" class="eq-row" onmouseenter="highlightRoute('1A')" onmouseleave="resetHighlight()">
+                    <td rowspan="2" id="cell-ff1-span" style="text-align:center; font-weight:bold;">Q1</td>
+                    <td id="lbl-eq-1A" style="text-align:center; font-weight: bold; color:var(--accent-red);">T1</td>
+                    <td><div class="eq-scroll-box" id="eq-1A" data-eq=""><span class="var-text">...</span></div></td>
+                </tr>
+                <tr id="row-ff1-2" class="eq-row" onmouseenter="highlightRoute('1B')" onmouseleave="resetHighlight()">
+                    <td id="lbl-eq-1B" style="text-align:center; font-weight: bold; color:var(--accent-red);">K1</td>
+                    <td><div class="eq-scroll-box" id="eq-1B" data-eq=""><span class="var-text">...</span></div></td>
+                </tr>
+                <tr id="row-ff0-1" class="eq-row" onmouseenter="highlightRoute('0A')" onmouseleave="resetHighlight()">
+                    <td rowspan="2" id="cell-ff0-span" style="text-align:center; font-weight:bold;">Q0</td>
+                    <td id="lbl-eq-0A" style="text-align:center; font-weight: bold; color:var(--accent-red);">T0</td>
+                    <td><div class="eq-scroll-box" id="eq-0A" data-eq=""><span class="var-text">...</span></div></td>
+                </tr>
+                <tr id="row-ff0-2" class="eq-row" onmouseenter="highlightRoute('0B')" onmouseleave="resetHighlight()">
+                    <td id="lbl-eq-0B" style="text-align:center; font-weight: bold; color:var(--accent-red);">K0</td>
+                    <td><div class="eq-scroll-box" id="eq-0B" data-eq=""><span class="var-text">...</span></div></td>
+                </tr>
+                <tr class="eq-row" onmouseenter="highlightRoute('Z')" onmouseleave="resetHighlight()">
+                    <td colspan="2" style="text-align:center; font-weight:bold;">Output</td>
+                    <td><div class="eq-scroll-box" id="eq-z" data-eq=""><span class="var-text" style="color:var(--accent-green);">...</span></div></td>
+                </tr>
+            </table>
+        </div>
+        <div class="section-box" style="border-top: 4px solid var(--accent-yellow);">
+            <div class="box-title" style="color: var(--accent-yellow);">🗺 4. K-Map Viewer (QM Solver)</div>
+            <div class="kmap-tabs" id="kmap-tab-container">
+                <button id="tab-1A" onclick="selectKMap('1A')">T1</button>
+                <button id="tab-1B" onclick="selectKMap('1B')">K1</button>
+                <button id="tab-0A" onclick="selectKMap('0A')" class="active">T0</button>
+                <button id="tab-0B" onclick="selectKMap('0B')">K0</button>
+                <button id="tab-Z" onclick="selectKMap('Z')">Z</button>
+            </div>
+            <p id="kmap-title-lbl" style="font-size: 13px; text-align: center; font-weight: bold; color: var(--text-muted); margin: 10px 0;">MAP</p>
+            <div id="dynamic-kmap-wrapper"></div>
+            <div class="formula-container" id="kmap-result">
+                <span style="font-weight:bold; color:var(--text-muted);">(Simplified) </span> ...
             </div>
         </div>
 
-        <div class="col col-3">
-            <div class="section-title" style="margin-bottom: 5px;">OUTPUT 2: LIVE SCHEMATIC</div>
-            <div class="svg-toolbar">
-                <button title="Zoom In" onclick="zoom(0.1)">🔍+</button>
-                <button title="Zoom Out" onclick="zoom(-0.1)">🔍-</button>
-                <button title="Reset View" onclick="resetZoom()">🔄</button>
-                <button title="Export SVG" onclick="exportSVG()">💾</button>
+        <div class="section-box" style="border-top: 4px solid var(--accent-purple);">
+            <div class="box-title" style="color: var(--accent-purple);">⏱️ 5. Sequence Simulator (動態模擬)</div>
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <label style="font-size:12px; font-weight:bold;">初始狀態:</label>
+                <!-- 模擬器的起始狀態現在也會跟著自訂名稱同步 -->
+                <select id="sim-start-state" class="table-select" style="width:100px; color:var(--text-main);"></select>
+                <label style="font-size:12px; font-weight:bold; margin-left:10px;">輸入波形:</label>
+                <input type="text" id="sim-input" class="var-input" placeholder="例如: 10110" style="flex:1; border-color:var(--accent-purple); color:var(--accent-purple);" value="10110">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="action-btn" style="background-color: var(--accent-purple); color: white; border: none; font-size: 13px;" onclick="startSimulation()">▶️ 執行模擬</button>
+                <button class="action-btn" style="max-width: 80px;" onclick="stopSimulation()">⏹ 停止</button>
+            </div>
+            <div id="sim-log" style="margin-top:15px; display:flex; gap:10px; overflow-x:auto; padding:5px 5px 15px 5px; scrollbar-width: thin;">
+                <div style="font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 5px;">請輸入 0 或 1 組成的訊號並按下播放，右方將同步追蹤。</div>
             </div>
             
-            <div class="diagram-area" id="diagram-area">
-                <svg id="circuit-svg" width="100%" height="100%" viewBox="0 0 650 550" xmlns="http://www.w3.org/2000/svg">
-                    <defs><circle id="dot" cx="0" cy="0" r="3" fill="var(--svg-line)" /></defs>
-                    <g id="svg-pan-zoom" transform="matrix(1 0 0 1 0 0)">
+            <div id="waveform-container" class="waveform-container" style="display: none;">
+                <div style="font-size: 12px; font-weight: 800; color: var(--accent-purple); margin-bottom: 8px;">📊 數位波形分析 (Logic Analyzer)</div>
+                <svg id="waveform-svg" width="100%" height="200" style="min-width: 100%;"></svg>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔥 新增左右拖曳的分隔線 -->
+    <div class="splitter" id="drag-splitter" title="拖曳調整版面大小"></div>
+
+    <div class="visual-panel">
+        <div class="section-box canvas-container" style="border-top: 4px solid var(--accent-green); margin-bottom: 0;">
+            <div class="box-title" style="color: var(--accent-green);">
+                <span>🔌 OUTPUT 2: LIVE SCHEMATIC</span>
+                <div class="svg-toolbar">
+                    <button onclick="zoom(0.1)">🔍+</button>
+                    <button onclick="zoom(-0.1)">🔍-</button>
+                    <button onclick="resetZoom()">🔄</button>
+                    <button onclick="exportSVG()">💾 SVG</button>
+                </div>
+            </div> 
+            <svg id="circuit-svg" width="100%" height="100%" viewBox="0 0 850 500" style="cursor: grab;">
+                <defs><circle id="dot" cx="0" cy="0" r="3" fill="#888" /></defs>
+                <g id="svg-pan-zoom" transform="matrix(1 0 0 1 0 0)">
+                    <g id="static-components" style="font-family: 'Inter', sans-serif;">
+                        <text id="lbl-X" x="40" y="30" font-weight="bold" font-size="13" class="svg-text-main">X</text>
+                        <line x1="50" y1="35" x2="50" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                        <text id="lbl-X-not" x="80" y="30" font-weight="bold" font-size="13" class="svg-text-main">X'</text>
+                        <line x1="90" y1="65" x2="90" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                        <polygon points="50,45 70,52 50,59" fill="#ffffff" class="svg-stroke-main" stroke-width="1.5"/>
+                        <circle cx="75" cy="52" r="3" fill="#ffffff" class="svg-stroke-main" stroke-width="1.5"/>
+                        <use href="#dot" x="50" y="52"/>
                         
-                        <g id="static-components" style="font-family: 'Inter', sans-serif;">
-                            <text id="lbl-X" x="25" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">X</text>
-                            <line x1="30" y1="35" x2="30" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-                            <text id="lbl-X-not" x="45" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">X'</text>
-                            <line x1="50" y1="65" x2="50" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-                            <polygon points="30,45 45,52 30,59" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="1.5"/>
-                            <circle cx="48" cy="52" r="2.5" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="1.5"/>
-                            <use href="#dot" x="30" y="52" />
-
-                            <g id="ff1-group">
-                                <text x="65" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
-                                <line x1="70" y1="35" x2="70" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-                                <text x="82" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q1'</text>
-                                <line x1="90" y1="35" x2="90" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-
-                                <rect x="420" y="100" width="70" height="100" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="2" rx="4" />
-                                <text x="445" y="120" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
-                                <text id="svg-ff1-lbl1" x="425" y="135" font-size="12" font-weight="bold" fill="#d9534f">J1</text>
-                                <text id="svg-ff1-lbl2" x="425" y="185" font-size="12" font-weight="bold" fill="#d9534f">K1</text>
-                                <text id="svg-ff1-type" x="435" y="160" font-size="10" fill="var(--text-muted)" font-weight="bold">JK-FF</text>
-                                <text x="475" y="135" font-size="12" font-weight="bold" fill="var(--text-main)">Q</text>
-                                <text x="470" y="185" font-size="12" font-weight="bold" fill="var(--text-main)">Q'</text>
-                                <polygon points="420,165 430,155 440,165" fill="none" stroke="var(--svg-line)" stroke-width="1.5" />
-                                
-                                <line x1="490" y1="130" x2="580" y2="130" stroke="var(--svg-line)" stroke-width="2"/>
-                                <use href="#dot" x="510" y="130" />
-                                <polyline points="510,130 510,20 70,20 70,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="4,4"/>
-                                <text x="585" y="135" font-size="12" font-weight="bold" fill="var(--text-main)">Q1</text>
-
-                                <line x1="490" y1="180" x2="520" y2="180" stroke="var(--svg-line)" stroke-width="2"/>
-                                <use href="#dot" x="520" y="180" />
-                                <polyline points="520,180 520,10 90,10 90,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="4,4"/>
-                            </g>
-
-                            <text x="105" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
-                            <line x1="110" y1="35" x2="110" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-                            <text x="122" y="30" font-size="12" font-weight="bold" fill="var(--text-main)">Q0'</text>
-                            <line x1="130" y1="35" x2="130" y2="520" stroke="var(--text-muted)" stroke-width="2"/>
-
-                            <rect x="420" y="280" width="70" height="100" fill="var(--svg-bg)" stroke="var(--svg-line)" stroke-width="2" rx="4" />
-                            <text x="445" y="300" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
-                            <text id="svg-ff0-lbl1" x="425" y="315" font-size="12" font-weight="bold" fill="#d9534f">J0</text>
-                            <text id="svg-ff0-lbl2" x="425" y="365" font-size="12" font-weight="bold" fill="#d9534f">K0</text>
-                            <text id="svg-ff0-type" x="435" y="340" font-size="10" fill="var(--text-muted)" font-weight="bold">JK-FF</text>
-                            <text x="475" y="315" font-size="12" font-weight="bold" fill="var(--text-main)">Q</text>
-                            <text x="470" y="365" font-size="12" font-weight="bold" fill="var(--text-main)">Q'</text>
-                            <polygon points="420,345 430,335 440,345" fill="none" stroke="var(--svg-line)" stroke-width="1.5" />
-                            
-                            <line x1="490" y1="310" x2="580" y2="310" stroke="var(--svg-line)" stroke-width="2"/>
-                            <use href="#dot" x="530" y="310" />
-                            <polyline points="530,310 530,25 110,25 110,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="4,4"/>
-                            <text x="585" y="315" font-size="12" font-weight="bold" fill="var(--text-main)">Q0</text>
-
-                            <line x1="490" y1="360" x2="540" y2="360" stroke="var(--svg-line)" stroke-width="2"/>
-                            <use href="#dot" x="540" y="360" />
-                            <polyline points="540,360 540,5 130,5 130,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="4,4"/>
-
-                            <polyline points="20,480 400,480 400,340 420,340" fill="none" stroke="var(--text-muted)" stroke-width="2" />
-                            <use href="#dot" x="400" y="480" />
-                            <polyline id="clk-ff1-line" points="400,480 400,160 420,160" fill="none" stroke="var(--text-muted)" stroke-width="2" />
-                            <text x="10" y="475" font-size="12" font-weight="bold" fill="var(--text-muted)">CLK</text>
-
-                            <text id="lbl-out-Z" x="585" y="455" font-size="16" font-weight="bold" fill="var(--text-main)">Z</text>
-                            <line x1="560" y1="450" x2="580" y2="450" stroke="var(--svg-line)" stroke-width="2"/>
+                        <g id="ff1-group">
+                            <text x="130" y="30" font-weight="bold" font-size="13" class="svg-text-main">Q1</text>
+                            <line x1="140" y1="35" x2="140" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                            <text x="170" y="30" font-weight="bold" font-size="13" class="svg-text-main">Q1'</text>
+                            <line x1="180" y1="35" x2="180" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                            <rect x="580" y="80" width="80" height="120" fill="#ffffff" class="svg-stroke-main" stroke-width="2" rx="4"/>
+                            <text x="620" y="100" text-anchor="middle" font-weight="800" class="svg-text-main">Q1</text>
+                            <text id="svg-ff1-lbl1" x="585" y="120" font-size="13" font-weight="bold" fill="#d9534f">T1</text>
+                            <text id="svg-ff1-lbl2" x="585" y="160" font-size="13" font-weight="bold" fill="#d9534f" style="display:none;">K1</text>
+                            <polygon points="580,180 595,185 580,190" fill="none" class="svg-stroke-main" stroke-width="1.5"/>
+                            <text id="svg-ff1-type" x="620" y="195" text-anchor="middle" font-size="11" class="svg-text-muted" font-weight="bold">T-FF</text>
+                            <text x="645" y="120" font-size="13" font-weight="bold" class="svg-text-main">Q</text>
+                            <text x="640" y="170" font-size="13" font-weight="bold" class="svg-text-main">Q'</text> 
+                            <line x1="660" y1="115" x2="760" y2="115" class="svg-stroke-main" stroke-width="2"/>
+                            <use href="#dot" x="690" y="115" />
+                            <polyline points="690,115 690,20 140,20 140,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="5,3"/>
+                            <text x="765" y="120" font-size="13" font-weight="bold" class="svg-text-main">Q1</text>
+                            <line x1="660" y1="165" x2="700" y2="165" class="svg-stroke-main" stroke-width="2"/>
+                            <use href="#dot" x="700" y="165" />
+                            <polyline points="700,165 700,10 180,10 180,35" fill="none" stroke="#5bc0de" stroke-width="2" stroke-dasharray="5,3"/>
                         </g>
 
-                        <g id="dynamic-routing-layer"></g>
+                        <text x="210" y="30" font-weight="bold" font-size="13" class="svg-text-main">Q0</text>
+                        <line x1="220" y1="35" x2="220" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                        <text x="250" y="30" font-weight="bold" font-size="13" class="svg-text-main">Q0'</text>
+                        <line x1="260" y1="35" x2="260" y2="480" class="svg-stroke-muted" stroke-width="2"/>
+                        <rect x="580" y="250" width="80" height="120" fill="#ffffff" class="svg-stroke-main" stroke-width="2" rx="4"/>
+                        <text x="620" y="270" text-anchor="middle" font-weight="800" class="svg-text-main">Q0</text>
+                        <text id="svg-ff0-lbl1" x="585" y="290" font-size="13" font-weight="bold" fill="#d9534f">T0</text>
+                        <text id="svg-ff0-lbl2" x="585" y="330" font-size="13" font-weight="bold" fill="#d9534f" style="display:none;">K0</text>
+                        <polygon points="580,350 595,355 580,360" fill="none" class="svg-stroke-main" stroke-width="1.5"/>
+                        <text id="svg-ff0-type" x="620" y="365" text-anchor="middle" font-size="11" class="svg-text-muted" font-weight="bold">T-FF</text>
+                        <text x="645" y="290" font-size="13" font-weight="bold" class="svg-text-main">Q</text>
+                        <text x="640" y="340" font-size="13" font-weight="bold" class="svg-text-main">Q'</text> 
+                        <line x1="660" y1="285" x2="760" y2="285" class="svg-stroke-main" stroke-width="2"/>
+                        <use href="#dot" x="710" y="285" />
+                        <polyline points="710,285 710,25 220,25 220,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="5,3"/>
+                        <text x="765" y="290" font-size="13" font-weight="bold" class="svg-text-main">Q0</text>
+                        <line x1="660" y1="335" x2="720" y2="335" class="svg-stroke-main" stroke-width="2"/>
+                        <use href="#dot" x="720" y="335" />
+                        <polyline points="720,335 720,5 260,5 260,35" fill="none" stroke="#5cb85c" stroke-width="2" stroke-dasharray="5,3"/>
+                        
+                        <polyline points="20,440 560,440 560,355 580,355" fill="none" class="svg-stroke-muted" stroke-width="2" />
+                        <use href="#dot" x="560" y="440" />
+                        <polyline id="clk-ff1-line" points="560,440 560,185 580,185" fill="none" class="svg-stroke-muted" stroke-width="2" />
+                        <text x="15" y="435" font-size="13" font-weight="bold" class="svg-text-muted">CLK</text>
+                        <text id="lbl-out-Z" x="765" y="415" font-size="18" font-weight="800" fill="#5cb85c">Z</text>
+                        <line x1="730" y1="410" x2="760" y2="410" class="svg-stroke-main" stroke-width="2"/>
                     </g>
-                </svg>
+                    <g id="dynamic-routing-layer"></g>
+                </g>
+            </svg>
+        </div>
+        <div class="section-box state-diagram-container" style="border-top: 4px solid var(--accent-yellow); margin-bottom: 0;">
+            <div class="box-title" style="color: var(--accent-yellow);">
+                <span>🔄 STATE TRANSITION DIAGRAM</span>
             </div>
+            <svg id="state-diagram-svg" width="100%" height="100%" viewBox="0 -80 400 450" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // UI 互動特效與工具列控制
-    // ==========================================
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        triggerUpdate(); 
-    }
+// ================================================================
+// UI 與 導覽操作
+// ================================================================
+function closeTour() {
+    document.getElementById('welcome-overlay').style.opacity = '0';
+    document.getElementById('tour-modal').style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+        document.getElementById('welcome-overlay').style.display = 'none';
+    }, 400);
+}
 
-    const svgArea = document.getElementById('diagram-area');
-    const svgGroup = document.getElementById('svg-pan-zoom');
-    let scale = 1, panX = 0, panY = 0;
-    let isDragging = false, startX, startY;
+function showToast(message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerText = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
 
-    function applyTransform() { svgGroup.setAttribute('transform', `matrix(${scale} 0 0 ${scale} ${panX} ${panY})`); }
-    function zoom(delta) { scale = Math.max(0.5, Math.min(2, scale + delta)); applyTransform(); }
-    function resetZoom() { scale = 1; panX = 0; panY = 0; applyTransform(); }
+const svgArea = document.getElementById('circuit-svg');
+const svgGroup = document.getElementById('svg-pan-zoom');
+let scale = 1, panX = 0, panY = 0;
+let isDragging = false, startX, startY;
 
-    svgArea.addEventListener('wheel', (e) => { e.preventDefault(); zoom(e.deltaY > 0 ? -0.1 : 0.1); });
-    svgArea.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY; });
-    window.addEventListener('mousemove', (e) => { if(isDragging) { panX = e.clientX - startX; panY = e.clientY - startY; applyTransform(); }});
-    window.addEventListener('mouseup', () => { isDragging = false; });
+function applyTransform() { svgGroup.setAttribute('transform', `matrix(${scale} 0 0 ${scale} ${panX} ${panY})`); }
+function zoom(delta) { scale = Math.max(0.5, Math.min(2, scale + delta)); applyTransform(); }
+function resetZoom() { scale = 1; panX = 0; panY = 0; applyTransform(); }
 
-    function exportSVG() {
-        const svgElement = document.getElementById('circuit-svg');
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-        const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "Sequential_Circuit.svg";
-        link.click();
-    }
+svgArea.addEventListener('wheel', (e) => { e.preventDefault(); zoom(e.deltaY > 0 ? -0.1 : 0.1); });
+svgArea.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY; });
+window.addEventListener('mousemove', (e) => { if(isDragging) { panX = e.clientX - startX; panY = e.clientY - startY; applyTransform(); }});
+window.addEventListener('mouseup', () => { isDragging = false; });
 
-    // Hover 聯動高亮 (指哪亮哪)
-    function highlightRoute(pin) {
-        const routes = document.querySelectorAll('.routed-element');
-        routes.forEach(el => el.classList.add('dimmed')); 
-        document.querySelectorAll('.route-' + pin).forEach(el => {
-            el.classList.remove('dimmed');
-            el.classList.add('glow'); 
-        });
-    }
-    function resetHighlight() {
-        document.querySelectorAll('.routed-element').forEach(el => {
-            el.classList.remove('dimmed');
-            el.classList.remove('glow');
-        });
-    }
+function exportSVG() {
+    const svgElement = document.getElementById('circuit-svg');
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Sequential_Circuit.svg";
+    link.click();
+    showToast("💾 電路圖 SVG 下載成功！");
+}
 
-    // ==========================================
-    // 系統狀態控制與事件綁定
-    // ==========================================
-    let kmapData = {};
-    let currentKMapTab = '0A';
-    let currentInVar = 'X';
-    let currentNumVars = 3;
+function highlightRoute(pin) {
+    document.querySelectorAll('.routed-element').forEach(el => el.classList.add('dimmed')); 
+    document.querySelectorAll('.route-' + pin).forEach(el => {
+        el.classList.remove('dimmed');
+        el.classList.add('glow'); 
+    });
+}
+function resetHighlight() {
+    document.querySelectorAll('.routed-element').forEach(el => {
+        el.classList.remove('dimmed');
+        el.classList.remove('glow');
+    });
+}
 
-    document.querySelectorAll('input[name="model"]').forEach(el => el.addEventListener('change', handleModelChange));
-    document.querySelectorAll('input[name="ff_type"], #input-var, #output-var').forEach(el => el.addEventListener('change', triggerUpdate));
-    document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    document.querySelectorAll('.svg-text-main').forEach(el => el.setAttribute('fill', isDark ? '#f8f9fa' : '#333333'));
+    document.querySelectorAll('.svg-stroke-main').forEach(el => el.setAttribute('stroke', isDark ? '#f8f9fa' : '#333333'));
+}
+
+// ================================================================
+// 全域狀態
+// ================================================================
+let kmapData = {};
+let currentKMapTab = '0A';
+let currentNumVars = 3;  
+let currentInVar = 'X';
+let stateMapGlobal = {}; // 儲存供波形與匯出使用
+
+// ================================================================
+// 狀態表操作
+// ================================================================
+function getTableData() {
+    const rows = document.querySelectorAll('#state-table tbody tr');
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    let data = [];
+    let lastZ = '0'; 
     
-    document.getElementById('state-table').addEventListener('input', (e) => {
-        if (e.target.classList.contains('editable-cell')) {
-            const text = e.target.innerText.trim();
-            if (text.length > 1 || !/^[01A-Za-z]?$/.test(text)) {
-                e.target.classList.add('shake-error');
-                setTimeout(() => e.target.classList.remove('shake-error'), 400);
-            }
-            triggerUpdate();
+    rows.forEach((row) => {
+        let cells = row.getElementsByTagName('td');
+        if (cells.length < 3) return;
+        
+        let ps = cells[0].innerText.trim().toUpperCase();
+        let x  = cells[1].innerText.trim();
+        let nsSelect = cells[2].querySelector('.ns-select');
+        let ns = nsSelect ? nsSelect.value : ps;
+        
+        let zSelect = cells.length >= 4 ? cells[cells.length-1].querySelector('.z-select') : null;
+        let z;
+        if (zSelect) {
+            z = zSelect.value;
+            lastZ = z; 
+        } else {
+            z = isMoore ? lastZ : '0'; 
+        }
+        data.push({ps, x, ns, z});
+    });
+    return data;
+}
+
+function renderTableHTML(data) {
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    const tbody = document.querySelector('#state-table tbody');
+    const thOut = document.getElementById('th-out');
+    const outVar = document.getElementById('output-var').value || 'Z';
+    thOut.innerHTML = isMoore 
+        ? `<span class="dyn-out">${outVar}</span><br><span style="font-size:0.7em;color:var(--text-muted);">(State Only)</span>`
+        : `<span class="dyn-out">${outVar}</span>`;
+
+    let uniqueStates = Array.from(new Set(data.map(d => d.ps))).filter(s => s !== "");
+    let html = '';
+
+    for(let i = 0; i < data.length; i++) {
+        let nsSelect = `<select class="table-select ns-select" onchange="triggerUpdate()">`;
+        uniqueStates.forEach(s => {
+            nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`;
+        });
+        nsSelect += `</select>`;
+
+        let zSelect = `<select class="table-select z-select" onchange="triggerUpdate()">
+            <option value="0" ${data[i].z === '0' ? 'selected' : ''}>0</option>
+            <option value="1" ${data[i].z === '1' ? 'selected' : ''}>1</option>
+        </select>`;
+
+        html += `<tr>`;
+        // 🔥 加入 editable-cell 樣式與提示，讓自訂狀態更明顯
+        html += `<td class="editable-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱">${data[i].ps}</td>`;
+        html += `<td class="editable-cell" contenteditable="true" style="color:var(--accent-red);">${data[i].x}</td>`;
+        html += `<td>${nsSelect}</td>`;
+        if (isMoore) {
+            if (i % 2 === 0) html += `<td rowspan="2" style="vertical-align:middle;">${zSelect}</td>`;
+        } else {
+            html += `<td>${zSelect}</td>`;
+        }
+        html += `</tr>`;
+    }
+    tbody.innerHTML = html;
+
+    document.querySelectorAll('.editable-cell').forEach(cell => {
+        cell.addEventListener('input', () => triggerUpdate());
+    });
+}
+
+function handleModelChange() { 
+    let data = getTableData(); 
+    renderTableHTML(data); 
+    triggerUpdate(); 
+}
+
+function updateRowCount() {
+    const count = parseInt(document.querySelector('input[name="row_count"]:checked').value);
+    const states  = ['A','A','B','B','C','C','D','D'];
+    const inputs  = ['0','1','0','1','0','1','0','1'];
+    const nextSt  = ['A','B','C','A','A','C','B','C']; 
+    const zVals   = ['0','0','1','0','1','1','0','1'];
+    let data = [];
+    for(let i = 0; i < count; i++) 
+        data.push({ ps: states[i], x: inputs[i], ns: nextSt[i], z: zVals[i] });
+    renderTableHTML(data);
+    triggerUpdate();
+}
+
+function loadPresetMoore() {
+    document.querySelector('input[name="row_count"][value="8"]').checked = true;
+    document.querySelector('input[name="ff_type"][value="d"]').checked = true;
+    document.querySelector('input[name="model"][value="moore"]').checked = true;
+    
+    // 🔥 提供直覺的自訂狀態範例
+    const data = [
+        {ps:'IDLE', x:'0', ns:'IDLE', z:'0'}, {ps:'IDLE', x:'1', ns:'S1', z:'0'}, 
+        {ps:'S1',   x:'0', ns:'S1',   z:'1'}, {ps:'S1',   x:'1', ns:'S2', z:'1'}, 
+        {ps:'S2',   x:'0', ns:'S2',   z:'0'}, {ps:'S2',   x:'1', ns:'S3', z:'0'},
+        {ps:'S3',   x:'0', ns:'S3',   z:'1'}, {ps:'S3',   x:'1', ns:'IDLE', z:'1'}
+    ];
+    document.getElementById('input-var').value  = 'X';
+    document.getElementById('output-var').value = 'Z';
+    renderTableHTML(data); 
+    triggerUpdate();
+}
+
+function enforceMooreSync() {
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    if (!isMoore) return;
+    const rows = document.querySelectorAll('#state-table tbody tr');
+    let zMap = {};
+    rows.forEach(row => {
+        let cells = row.getElementsByTagName('td');
+        if (cells.length < 4) return;
+        let ps = cells[0].innerText.trim().toUpperCase();
+        if (ps === "") return;
+        let zSelect = cells[cells.length-1].querySelector('select');
+        if (!zSelect) return;
+        let val = zSelect.value;
+        if (zMap[ps] === undefined) zMap[ps] = val;
+        else if (zMap[ps] !== val) {
+            zSelect.value = zMap[ps];
+            cells[cells.length-1].classList.add('sync-flash');
+            setTimeout(() => cells[cells.length-1].classList.remove('sync-flash'), 500);
         }
     });
+}
 
-    function getTableData() {
-        const rows = document.getElementById('state-table').getElementsByTagName('tr');
-        let data = []; let lastZ = '0';
-        for(let i=1; i<rows.length; i++) {
-            let cells = rows[i].getElementsByTagName('td');
-            if (cells.length < 3) continue;
-            let ps = cells[0].innerText.trim(); let x = cells[1].innerText.trim(); let ns = cells[2].innerText.trim();
-            let z = (cells.length === 4) ? cells[3].innerText.trim() : lastZ;
-            if (cells.length === 4) lastZ = z;
-            data.push({ps, x, ns, z});
+function clearTable() {
+    let data = getTableData();
+    data.forEach(d => { d.ns = d.ps; d.z = '0'; });
+    renderTableHTML(data); 
+    triggerUpdate();
+}
+
+function loadExample() {
+    document.querySelector('input[name="row_count"][value="6"]').checked = true;
+    document.querySelector('input[name="ff_type"][value="jk"]').checked = true;
+    document.querySelector('input[name="model"][value="mealy"]').checked = true;
+    const data = [
+        {ps:'A', x:'0', ns:'A', z:'0'}, {ps:'A', x:'1', ns:'B', z:'0'}, 
+        {ps:'B', x:'0', ns:'C', z:'1'}, {ps:'B', x:'1', ns:'A', z:'0'}, 
+        {ps:'C', x:'0', ns:'A', z:'1'}, {ps:'C', x:'1', ns:'C', z:'1'}
+    ];
+    document.getElementById('input-var').value  = 'X';
+    document.getElementById('output-var').value = 'Z';
+    renderTableHTML(data); 
+    triggerUpdate();
+}
+
+// 🔥 新增：動態更新下拉選單選項 (當使用者手動修改狀態名稱時，選單要跟著變)
+function updateDynamicDropdowns() {
+    const rows = document.querySelectorAll('#state-table tbody tr');
+    let uniqueStates = new Set();
+    rows.forEach(row => {
+        let ps = row.cells[0].innerText.trim().toUpperCase();
+        if (ps) uniqueStates.add(ps);
+    });
+    let stateArray = Array.from(uniqueStates).sort();
+    if (stateArray.length > 4) stateArray = stateArray.slice(0, 4);
+
+    document.querySelectorAll('.ns-select').forEach(sel => {
+        let oldVal = sel.value;
+        sel.innerHTML = stateArray.map(s => `<option value="${s}">${s}</option>`).join('');
+        if (stateArray.includes(oldVal)) sel.value = oldVal;
+    });
+
+    let simSel = document.getElementById('sim-start-state');
+    if (simSel) {
+        let oldSimVal = simSel.value;
+        simSel.innerHTML = stateArray.map(s => `<option value="${s}">${s}</option>`).join('');
+        if (stateArray.includes(oldSimVal)) simSel.value = oldSimVal;
+    }
+}
+
+function triggerUpdate() {
+    enforceMooreSync();
+    updateDynamicDropdowns(); // 🔥 確保選單在繪製前先同步最新名稱
+    document.getElementById('dynamic-routing-layer').innerHTML = '';
+    setTimeout(() => {
+        runLogicSynthesis();
+        drawStateDiagram();
+        stopSimulation(); 
+    }, 50);
+}
+
+document.querySelectorAll('input[name="model"]').forEach(el => el.addEventListener('change', handleModelChange));
+document.querySelectorAll('input[name="ff_type"], input[name="encoding"], #input-var, #output-var').forEach(el => el.addEventListener('change', triggerUpdate));
+document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
+
+// ================================================================
+// ★ 完美移植你的 Q-M 演算法與正反器邏輯
+// ================================================================
+function getFFInputs(q, nq, type) {
+    let curr = Number(q);
+    let next = Number(nq);
+    if (type === 'jk') {
+        if (curr===0 && next===0) return ['0', 'X']; if (curr===0 && next===1) return ['1', 'X'];
+        if (curr===1 && next===0) return ['X', '1']; if (curr===1 && next===1) return ['X', '0'];
+    } else if (type === 'sr') {
+        if (curr===0 && next===0) return ['0', 'X']; if (curr===0 && next===1) return ['1', '0'];
+        if (curr===1 && next===0) return ['0', '1']; if (curr===1 && next===1) return ['X', '0'];
+    } else if (type === 'd') { 
+        return [next.toString(), null]; 
+    } else if (type === 't') { 
+        return [curr===next ? '0':'1', null]; 
+    }
+    return ['X', 'X'];
+}
+
+function minimizeLogicExact(outputs, varName, numVars) {
+    let ones = [], zeros = []; let maxVal = 1 << numVars;
+    for(let i=0; i<maxVal; i++) { if(outputs[i] === '1') ones.push(i); else if(outputs[i] === '0') zeros.push(i); }
+    if(ones.length === 0) return '0'; if(zeros.length === 0) return '1';
+
+    let implicants = [];
+    const generate = (prefix, length) => { if(prefix.length === length) { implicants.push(prefix); return; } for(let c of ['0','1','-']) generate(prefix + c, length); };
+    generate('', numVars);
+
+    let valid = implicants.filter(imp => { for(let z of zeros) { let zStr = z.toString(2).padStart(numVars, '0'); let match = true; for(let i=0; i<numVars; i++) { if(imp[i] !== '-' && imp[i] !== zStr[i]) { match = false; break; } } if(match) return false; } return true; });
+    let primes = valid.filter(imp => { for(let i=0; i<numVars; i++) { if(imp[i] !== '-') { let expanded = imp.substring(0,i) + '-' + imp.substring(i+1); if(valid.includes(expanded)) return false; } } return true; });
+
+    let bestSubset = []; let minCost = Infinity; let nPrimes = primes.length;
+    for(let i=1; i < (1<<nPrimes); i++) {
+        let subset = []; for(let j=0; j<nPrimes; j++) { if(i & (1<<j)) subset.push(primes[j]); }
+        let covered = new Set();
+        for(let imp of subset) { for(let o of ones) { let oStr = o.toString(2).padStart(numVars, '0'); let match = true; for(let k=0; k<numVars; k++) { if(imp[k] !== '-' && imp[k] !== oStr[k]) { match = false; break; } } if(match) covered.add(o); } }
+        if(covered.size === ones.length) {
+            let cost = subset.length * 10; for(let imp of subset) { for(let k=0; k<numVars; k++) if(imp[k] !== '-') cost += 1; }
+            if(cost < minCost) { minCost = cost; bestSubset = subset; }
         }
-        return data;
     }
 
-    function renderTableHTML(data) {
-        const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
-        const tbody = document.querySelector('#state-table tbody');
-        const thOut = document.getElementById('th-out');
-        const outVar = document.getElementById('output-var').value || 'Z';
-
-        thOut.innerHTML = isMoore ? `<span class="dyn-out">${outVar}</span><br><span style="font-size:0.7em; color:var(--text-muted);">(State Only)</span>` : `<span class="dyn-out">${outVar}</span>`;
-
-        let html = '';
-        for(let i=0; i<data.length; i++) {
-            html += `<tr><td class="editable-cell" contenteditable="true">${data[i].ps}</td><td class="editable-cell" contenteditable="true">${data[i].x}</td><td class="editable-cell" contenteditable="true">${data[i].ns}</td>`;
-            if (isMoore) {
-                if (i % 2 === 0) html += `<td class="editable-cell z-cell" contenteditable="true" rowspan="2" style="vertical-align: middle;">${data[i].z}</td>`;
-            } else {
-                html += `<td class="editable-cell" contenteditable="true">${data[i].z}</td>`;
-            }
-            html += `</tr>`;
-        }
-        tbody.innerHTML = html;
-    }
-
-    function handleModelChange() { let data = getTableData(); renderTableHTML(data); triggerUpdate(); }
-
-    function updateRowCount() {
-        const count = parseInt(document.querySelector('input[name="row_count"]:checked').value);
-        let data = [];
-        const states = ['A','A','B','B','C','C','D','D'];
-        const inputs = ['0','1','0','1','0','1','0','1'];
-        const nextSt = ['A','B','C','A','A','C','B','C']; 
-        const zVals  = ['0','0','1','0','1','1','0','1'];
-        for(let i=0; i<count; i++) data.push({ ps: states[i], x: inputs[i], ns: nextSt[i], z: zVals[i] });
-        renderTableHTML(data);
-        triggerUpdate();
-    }
-
-    function enforceMooreSync() {
-        const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
-        if(!isMoore) return;
-        const table = document.getElementById('state-table');
-        const rows = table.getElementsByTagName('tr');
-        let zMap = {};
-        for(let i=1; i<rows.length; i++) {
-            let cells = rows[i].getElementsByTagName('td');
-            if(cells.length < 4) continue;
-            let ps = cells[0].innerText.trim().toUpperCase();
-            let zCell = cells[3]; let val = zCell.innerText.trim();
-            if (zMap[ps] === undefined && val !== '') zMap[ps] = val; 
-            else if (zMap[ps] !== undefined && val !== zMap[ps]) {
-                zCell.innerText = zMap[ps]; 
-                zCell.classList.add('sync-flash');
-                setTimeout(() => zCell.classList.remove('sync-flash'), 500);
-            }
-        }
-    }
-
-    function clearTable() {
-        let data = getTableData();
-        for(let i=0; i<data.length; i++) { data[i].ns = ''; data[i].z = ''; }
-        renderTableHTML(data); triggerUpdate();
-    }
-
-    function loadExample() {
-        document.querySelector('input[name="row_count"][value="6"]').checked = true;
-        document.querySelector('input[name="ff_type"][value="jk"]').checked = true;
-        document.querySelector('input[name="model"][value="mealy"]').checked = true;
-        const data = [{ps:'A', x:'0', ns:'A', z:'0'}, {ps:'A', x:'1', ns:'B', z:'0'}, {ps:'B', x:'0', ns:'C', z:'1'}, {ps:'B', x:'1', ns:'A', z:'0'}, {ps:'C', x:'0', ns:'A', z:'1'}, {ps:'C', x:'1', ns:'C', z:'1'}];
-        document.getElementById('input-var').value = 'X'; document.getElementById('output-var').value = 'Z';
-        renderTableHTML(data); triggerUpdate();
-    }
-
-    function triggerUpdate() {
-        enforceMooreSync(); 
-        document.getElementById('dynamic-routing-layer').innerHTML = ''; 
-        setTimeout(runLogicSynthesis, 50); 
-    }
-
-    // ==========================================
-    // 卡諾圖產生器
-    // ==========================================
-    function renderKMapTemplate(numVars, inVar) {
-        const wrapper = document.getElementById('dynamic-kmap-wrapper');
-        const colorTitle = "color: var(--text-main); font-family: 'Fira Code', monospace;";
-        const colorLbl = "color: var(--text-muted); font-family: 'Fira Code', monospace;";
-        if (numVars === 2) {
-            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="2" style="font-size:13px; font-weight:800; ${colorTitle}">${inVar}</td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:13px; font-weight:800; ${colorTitle}">Q0</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td><td class="kmap-cell" id="kmap-2"></td><td class="kmap-cell" id="kmap-3"></td></tr></table>`;
+    return bestSubset.map(imp => {
+        let terms = [];
+        if(numVars === 3) {
+            if(imp[0] === '1') terms.push('Q1');    if(imp[0] === '0') terms.push("Q1'");
+            if(imp[1] === '1') terms.push('Q0');    if(imp[1] === '0') terms.push("Q0'");
+            if(imp[2] === '1') terms.push(varName); if(imp[2] === '0') terms.push(varName+"'");
         } else {
-            wrapper.innerHTML = `<table class="kmap-table"><tr><td colspan="2" rowspan="2"></td><td colspan="4" style="font-size:13px; font-weight:800; ${colorTitle}">Q0 ${inVar}</td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">00</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">01</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">11</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">10</td></tr><tr><td rowspan="2" style="vertical-align: middle; font-size:13px; font-weight:800; ${colorTitle}">Q1</td><td style="font-size:12px; font-weight:bold; ${colorLbl}">0</td><td class="kmap-cell" id="kmap-0"></td><td class="kmap-cell" id="kmap-1"></td><td class="kmap-cell" id="kmap-3"></td><td class="kmap-cell" id="kmap-2"></td></tr><tr><td style="font-size:12px; font-weight:bold; ${colorLbl}">1</td><td class="kmap-cell" id="kmap-4"></td><td class="kmap-cell" id="kmap-5"></td><td class="kmap-cell" id="kmap-7"></td><td class="kmap-cell" id="kmap-6"></td></tr></table>`;
+            if(imp[0] === '1') terms.push('Q0');    if(imp[0] === '0') terms.push("Q0'");
+            if(imp[1] === '1') terms.push(varName); if(imp[1] === '0') terms.push(varName+"'");
+        }
+        if(terms.length === 0) return '1';
+        return terms.join(' · ');
+    }).join(' + ');
+}
+
+// ================================================================
+// 卡諾圖 Template
+// ================================================================
+function renderKMapTemplate(numVars, inVar) {
+    const wrapper = document.getElementById('dynamic-kmap-wrapper');
+    if (!wrapper) return;
+    const cs = "color:var(--text-main);font-family:'Fira Code',monospace;";
+    const cm = "color:var(--text-muted);font-family:'Fira Code',monospace;";
+    const svgDiag = `<svg class="kmap-svg-diag"><line x1="0" y1="0" x2="100%" y2="100%" stroke="var(--border-color)" stroke-width="1.5"/></svg>`;
+
+    if (numVars === 2) {
+        wrapper.innerHTML = `
+        <table class="kmap-table">
+          <tr>
+            <td colspan="2" rowspan="2" class="kmap-diag-cell">${svgDiag}
+              <span class="kmap-lbl-left">Q0</span>
+              <span class="kmap-lbl-right">${inVar}</span>
+            </td>
+            <td colspan="2" style="font-weight:800;${cs}">${inVar}</td>
+          </tr>
+          <tr>
+            <td style="${cm}">0</td>
+            <td style="${cm}">1</td>
+          </tr>
+          <tr>
+            <td rowspan="2" style="vertical-align:middle;font-weight:800;${cs}">Q0</td>
+            <td style="${cm}">0</td>
+            <td class="kmap-cell" id="kmap-0"></td>
+            <td class="kmap-cell" id="kmap-1"></td>
+          </tr>
+          <tr>
+            <td style="${cm}">1</td>
+            <td class="kmap-cell" id="kmap-2"></td>
+            <td class="kmap-cell" id="kmap-3"></td>
+          </tr>
+        </table>`;
+    } else {
+        wrapper.innerHTML = `
+        <table class="kmap-table">
+          <tr>
+            <td colspan="2" rowspan="2" class="kmap-diag-cell">${svgDiag}
+              <span class="kmap-lbl-left">Q1</span>
+              <span class="kmap-lbl-right">Q0 ${inVar}</span>
+            </td>
+            <td colspan="4" style="font-weight:800;${cs}">Q0 ${inVar}</td>
+          </tr>
+          <tr>
+            <td style="${cm}">00</td>
+            <td style="${cm}">01</td>
+            <td style="${cm}">11</td>
+            <td style="${cm}">10</td>
+          </tr>
+          <tr>
+            <td rowspan="2" style="vertical-align:middle;font-weight:800;${cs}">Q1</td>
+            <td style="${cm}">0</td>
+            <td class="kmap-cell" id="kmap-0"></td>
+            <td class="kmap-cell" id="kmap-1"></td>
+            <td class="kmap-cell" id="kmap-3"></td>
+            <td class="kmap-cell" id="kmap-2"></td>
+          </tr>
+          <tr>
+            <td style="${cm}">1</td>
+            <td class="kmap-cell" id="kmap-4"></td>
+            <td class="kmap-cell" id="kmap-5"></td>
+            <td class="kmap-cell" id="kmap-7"></td>
+            <td class="kmap-cell" id="kmap-6"></td>
+          </tr>
+        </table>`;
+    }
+}
+
+function selectKMap(pin) {
+    currentKMapTab = pin;
+    document.querySelectorAll('.kmap-tabs button').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById('tab-' + pin);
+    if (btn) btn.classList.add('active');
+    const data = kmapData[pin];
+    if (!data) return;
+    let size = 1 << currentNumVars;
+    for (let i = 0; i < size; i++) {
+        let el = document.getElementById('kmap-' + i);
+        if (el) {
+            let val = data.array[i];
+            el.innerText = val === 'X' ? 'X' : val;
+            el.style.color = (val === 'X') ? 'var(--text-muted)' : (val === '1' ? 'var(--accent-red)' : 'var(--text-main)');
         }
     }
+    const resEl = document.getElementById('kmap-result');
+    if (resEl) resEl.innerHTML = `<span style="color:var(--text-muted);">(Simplified) ${data.label} = </span><span class="var-text">${data.eq}</span>`;
+}
 
-    function selectKMap(pin) {
-        currentKMapTab = pin;
-        document.querySelectorAll('.kmap-tabs button').forEach(btn => btn.classList.remove('active'));
-        const btn = document.getElementById('tab-' + pin);
-        if(btn) btn.classList.add('active');
+// ================================================================
+// 主邏輯合成核心
+// ================================================================
+function runLogicSynthesis() {
+    currentInVar = document.getElementById('input-var').value || 'X';
+    const outVar = document.getElementById('output-var').value || 'Z';
+    const ffType = document.querySelector('input[name="ff_type"]:checked').value;
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    const encoding = document.querySelector('input[name="encoding"]:checked').value;
+    const isSinglePin = (ffType === 't' || ffType === 'd');
 
-        const data = kmapData[pin];
-        if(!data) return;
+    document.querySelectorAll('.dyn-in').forEach(el => el.textContent = currentInVar);
+    document.querySelectorAll('.dyn-out').forEach(el => el.textContent = outVar);
+    let lX = document.getElementById('lbl-X'); if(lX) lX.textContent = currentInVar;
+    let lXn = document.getElementById('lbl-X-not'); if(lXn) lXn.textContent = currentInVar + "'";
+    let lZ = document.getElementById('lbl-out-Z'); if(lZ) lZ.textContent = outVar;
 
-        document.getElementById('kmap-title-lbl').innerText = `${data.label} MAP`;
-        let size = 1 << currentNumVars;
-        const isDark = document.body.classList.contains('dark-mode');
-        for(let i=0; i<size; i++) {
-            let el = document.getElementById('kmap-'+i);
-            if(el) {
-                let val = data.array[i] || 'X';
-                el.innerText = val;
-                el.style.color = (val === 'X') ? 'var(--text-muted)' : (isDark ? '#ff6b6b' : '#d9534f');
+    const lbl1A = ffType==='jk' ? 'J1' : (ffType==='sr' ? 'S1' : (ffType==='t' ? 'T1' : 'D1'));
+    const lbl1B = ffType==='jk' ? 'K1' : (ffType==='sr' ? 'R1' : '');
+    const lbl0A = ffType==='jk' ? 'J0' : (ffType==='sr' ? 'S0' : (ffType==='t' ? 'T0' : 'D0'));
+    const lbl0B = ffType==='jk' ? 'K0' : (ffType==='sr' ? 'R0' : '');
+
+    let tableData = getTableData();
+    let uniqueStates = new Set();
+    tableData.forEach(d => {
+        if (d.ps) uniqueStates.add(d.ps.toUpperCase());
+        if (d.ns) uniqueStates.add(d.ns.toUpperCase());
+    });
+    
+    let sortedStates = Array.from(uniqueStates).filter(s => s !== "").sort();
+    if (sortedStates.length > 4) sortedStates = sortedStates.slice(0, 4);
+
+    let ffCount = sortedStates.length <= 2 ? 1 : 2;
+    currentNumVars = ffCount + 1;
+
+    // 🔥 支援 Binary 與 Gray Code 動態編碼
+    let stateMap = {};
+    const gray2 = [[0,0], [0,1], [1,1], [1,0]];
+    sortedStates.forEach((s, idx) => {
+        if(ffCount === 1 && idx < 2) stateMap[s] = [idx % 2];
+        else if(ffCount === 2 && idx < 4) {
+            if (encoding === 'gray') stateMap[s] = gray2[idx];
+            else stateMap[s] = [Math.floor(idx/2), idx%2]; 
+        }
+    });
+    stateMapGlobal = stateMap; 
+
+    let assignLbl = document.getElementById('state-assign-lbl');
+    if (assignLbl) {
+        assignLbl.innerText = sortedStates.map(s => 
+            `${s}=${stateMap[s] ? stateMap[s].join('') : '?'}`
+        ).join(' , ') || '...';
+    }
+
+    let r11 = document.getElementById('row-ff1-1'); if(r11) r11.style.display = (ffCount===1) ? 'none' : 'table-row';
+    let r12 = document.getElementById('row-ff1-2'); if(r12) r12.style.display = (ffCount===1||isSinglePin) ? 'none' : 'table-row';
+    let r02 = document.getElementById('row-ff0-2'); if(r02) r02.style.display = isSinglePin ? 'none' : 'table-row';
+    let f1s = document.getElementById('cell-ff1-span'); if(f1s) f1s.rowSpan = isSinglePin ? 1 : 2;
+    let f0s = document.getElementById('cell-ff0-span'); if(f0s) f0s.rowSpan = isSinglePin ? 1 : 2;
+
+    let t1A = document.getElementById('tab-1A'); if(t1A) { t1A.style.display=(ffCount===1)?'none':'inline-block'; t1A.textContent=lbl1A; }
+    let t1B = document.getElementById('tab-1B'); if(t1B) { t1B.style.display=(ffCount===1||isSinglePin)?'none':'inline-block'; t1B.textContent=lbl1B; }
+    let t0A = document.getElementById('tab-0A'); if(t0A) t0A.textContent = lbl0A;
+    let t0B = document.getElementById('tab-0B'); if(t0B) { t0B.style.display=isSinglePin?'none':'inline-block'; t0B.textContent=lbl0B; }
+
+    if ((ffCount===1 && (currentKMapTab==='1A'||currentKMapTab==='1B')) ||
+        (isSinglePin && currentKMapTab.endsWith('B'))) {
+        currentKMapTab = '0A';
+    }
+    
+    document.getElementById('ff1-group').style.display = (ffCount === 1) ? 'none' : 'block';
+    document.getElementById('clk-ff1-line').style.display = (ffCount === 1) ? 'none' : 'block';
+
+    let le1A=document.getElementById('lbl-eq-1A'); if(le1A) le1A.textContent=lbl1A;
+    let le1B=document.getElementById('lbl-eq-1B'); if(le1B) le1B.textContent=lbl1B;
+    let le0A=document.getElementById('lbl-eq-0A'); if(le0A) le0A.textContent=lbl0A;
+    let le0B=document.getElementById('lbl-eq-0B'); if(le0B) le0B.textContent=lbl0B;
+    let sf1=document.getElementById('svg-ff1-type'); if(sf1) sf1.textContent=ffType.toUpperCase()+'-FF';
+    let sf0=document.getElementById('svg-ff0-type'); if(sf0) sf0.textContent=ffType.toUpperCase()+'-FF';
+    let s1l1=document.getElementById('svg-ff1-lbl1'); if(s1l1){s1l1.textContent=lbl1A;s1l1.setAttribute('y',isSinglePin?'145':'125');}
+    let s1l2=document.getElementById('svg-ff1-lbl2'); if(s1l2){s1l2.textContent=lbl1B;s1l2.style.display=isSinglePin?'none':'block';}
+    let s0l1=document.getElementById('svg-ff0-lbl1'); if(s0l1){s0l1.textContent=lbl0A;s0l1.setAttribute('y',isSinglePin?'315':'295');}
+    let s0l2=document.getElementById('svg-ff0-lbl2'); if(s0l2){s0l2.textContent=lbl0B;s0l2.style.display=isSinglePin?'none':'block';}
+
+    const size = 1 << currentNumVars;
+    let IN1_A = new Array(size).fill('X');
+    let IN1_B = new Array(size).fill('X');
+    let IN0_A = new Array(size).fill('X');
+    let IN0_B = new Array(size).fill('X');
+    let Z     = new Array(size).fill('X');
+
+    let mooreZMap = {};
+    if (isMoore) {
+        tableData.forEach(d => {
+            let ps = d.ps.toUpperCase();
+            if (ps && stateMap[ps] !== undefined) {
+                mooreZMap[ps] = d.z;
             }
-        }
-        document.getElementById('kmap-result').innerHTML = `(Simplified) ${data.label} = <span class="var-text">${data.eq}</span>`;
-    }
-
-    // ==========================================
-    // 邏輯合成與解析核心
-    // ==========================================
-    function getFFInputs(q, nq, type) {
-        if (type === 'jk') {
-            if (q===0 && nq===0) return ['0', 'X']; if (q===0 && nq===1) return ['1', 'X'];
-            if (q===1 && nq===0) return ['X', '1']; if (q===1 && nq===1) return ['X', '0'];
-        } else if (type === 'sr') {
-            if (q===0 && nq===0) return ['0', 'X']; if (q===0 && nq===1) return ['1', '0'];
-            if (q===1 && nq===0) return ['0', '1']; if (q===1 && nq===1) return ['X', '0'];
-        } else if (type === 'd') { return [nq.toString(), null]; } 
-        else if (type === 't') { return [q===nq ? '0':'1', null]; } 
-        return ['X', 'X'];
-    }
-
-    function runLogicSynthesis() {
-        currentInVar = document.getElementById('input-var').value || 'X';
-        const outVar = document.getElementById('output-var').value || 'Z';
-        const ffType = document.querySelector('input[name="ff_type"]:checked').value;
-        const isSinglePin = (ffType === 't' || ffType === 'd');
-
-        document.querySelectorAll('.dyn-in').forEach(el => el.textContent = currentInVar);
-        document.querySelectorAll('.dyn-out').forEach(el => el.textContent = outVar);
-        document.getElementById('lbl-X').textContent = currentInVar;
-        document.getElementById('lbl-X-not').textContent = currentInVar + "'";
-        document.getElementById('lbl-out-Z').textContent = outVar;
-
-        const lbl1A = ffType === 'jk' ? 'J1' : (ffType === 'sr' ? 'S1' : (ffType === 't' ? 'T1' : 'D1'));
-        const lbl1B = ffType === 'jk' ? 'K1' : (ffType === 'sr' ? 'R1' : '');
-        const lbl0A = ffType === 'jk' ? 'J0' : (ffType === 'sr' ? 'S0' : (ffType === 't' ? 'T0' : 'D0'));
-        const lbl0B = ffType === 'jk' ? 'K0' : (ffType === 'sr' ? 'R0' : '');
-
-        let tableData = getTableData();
-        let uniqueStates = new Set();
-        for(let i=0; i<tableData.length; i++) {
-            if(tableData[i].ps) uniqueStates.add(tableData[i].ps.toUpperCase()); 
-            if(tableData[i].ns) uniqueStates.add(tableData[i].ns.toUpperCase());
-        }
-        
-        let sortedStates = Array.from(uniqueStates).sort();
-        let ffCount = sortedStates.length <= 2 ? 1 : 2;
-        currentNumVars = ffCount + 1; 
-
-        let stateMap = {};
-        sortedStates.forEach((s, idx) => {
-            if(ffCount === 1 && idx < 2) stateMap[s] = [idx % 2];
-            else if(ffCount === 2 && idx < 4) stateMap[s] = [Math.floor(idx/2), idx%2];
         });
+    }
+
+    for(let i=0; i<tableData.length; i++) {
+        let ps = tableData[i].ps ? tableData[i].ps.toUpperCase() : '';
+        let ns = tableData[i].ns ? tableData[i].ns.toUpperCase() : '';
+        if(!stateMap[ps] || !stateMap[ns]) continue;
         
-        document.getElementById('state-assign-lbl').innerText = sortedStates.map(s => `${s}=${stateMap[s].join('')}`).join(' , ') || '...';
-
-        /* ======= 修復 D/T 正反器幽靈跨行 Bug ======= */
-        document.getElementById('row-ff1-1').style.display = (ffCount === 1) ? 'none' : 'table-row';
-        document.getElementById('row-ff1-2').style.display = (ffCount === 1 || isSinglePin) ? 'none' : 'table-row';
-        document.getElementById('row-ff0-2').style.display = isSinglePin ? 'none' : 'table-row';
+        let q_ps = stateMap[ps];
+        let q_ns = stateMap[ns];
+        let x = (tableData[i].x === '1') ? 1 : 0; 
         
-        // Q0 與 Q1 的 rowspan 必須同步調整
-        let ff1Span = document.getElementById('cell-ff1-span');
-        if(ff1Span) ff1Span.rowSpan = isSinglePin ? 1 : 2;
-        document.getElementById('cell-ff0-span').rowSpan = isSinglePin ? 1 : 2;
+        let idx = ffCount === 1 ? ((q_ps[0]<<1) | x) : ((q_ps[0]<<2) | (q_ps[1]<<1) | x);
 
-        document.getElementById('tab-1A').style.display = (ffCount === 1) ? 'none' : 'inline-block';
-        document.getElementById('tab-1B').style.display = (ffCount === 1 || isSinglePin) ? 'none' : 'inline-block';
-        document.getElementById('tab-0B').style.display = isSinglePin ? 'none' : 'inline-block';
-        if((ffCount === 1 && (currentKMapTab === '1A' || currentKMapTab === '1B')) || (isSinglePin && currentKMapTab.endsWith('B'))) currentKMapTab = '0A';
+        if (idx < 0 || idx >= size) continue;
 
-        document.getElementById('ff1-group').style.display = (ffCount === 1) ? 'none' : 'block';
-        document.getElementById('clk-ff1-line').style.display = (ffCount === 1) ? 'none' : 'block';
-
-        document.getElementById('lbl-eq-1A').textContent = lbl1A; document.getElementById('lbl-eq-1B').textContent = lbl1B;
-        document.getElementById('lbl-eq-0A').textContent = lbl0A; document.getElementById('lbl-eq-0B').textContent = lbl0B;
-        document.getElementById('tab-1A').textContent = lbl1A; document.getElementById('tab-1B').textContent = lbl1B;
-        document.getElementById('tab-0A').textContent = lbl0A; document.getElementById('tab-0B').textContent = lbl0B;
-
-        document.getElementById('svg-ff1-type').textContent = ffType.toUpperCase() + '-FF';
-        document.getElementById('svg-ff0-type').textContent = ffType.toUpperCase() + '-FF';
-        document.getElementById('svg-ff1-lbl1').textContent = lbl1A; document.getElementById('svg-ff1-lbl2').textContent = lbl1B;
-        document.getElementById('svg-ff0-lbl1').textContent = lbl0A; document.getElementById('svg-ff0-lbl2').textContent = lbl0B;
-        document.getElementById('svg-ff1-lbl1').setAttribute('y', isSinglePin ? '160' : '135');
-        document.getElementById('svg-ff0-lbl1').setAttribute('y', isSinglePin ? '340' : '315');
-
-        let size = 1 << currentNumVars;
-        let IN1_A = Array(size).fill('X'), IN1_B = Array(size).fill('X');
-        let IN0_A = Array(size).fill('X'), IN0_B = Array(size).fill('X');
-        let Z = Array(size).fill('X');
-
-        for(let i=0; i<tableData.length; i++) {
-            let ps = tableData[i].ps.toUpperCase(), ns = tableData[i].ns.toUpperCase(); 
-            if(!stateMap[ps] || !stateMap[ns]) continue;
-            let q_ps = stateMap[ps], q_ns = stateMap[ns];
-            let x = (tableData[i].x === '1') ? 1 : 0; 
-            let idx = ffCount === 1 ? ((q_ps[0]<<1) | x) : ((q_ps[0]<<2) | (q_ps[1]<<1) | x);
-
-            if (ffCount === 1) {
-                let ff0 = getFFInputs(q_ps[0], q_ns[0], ffType);
-                IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1];
-            } else {
-                let ff1 = getFFInputs(q_ps[0], q_ns[0], ffType); let ff0 = getFFInputs(q_ps[1], q_ns[1], ffType);
-                IN1_A[idx] = ff1[0]; IN1_B[idx] = ff1[1];
-                IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1];
-            }
+        if (ffCount === 1) {
+            let ff0 = getFFInputs(q_ps[0], q_ns[0], ffType);
+            IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1] !== null ? ff0[1] : 'X';
+        } else {
+            let ff1 = getFFInputs(q_ps[0], q_ns[0], ffType); 
+            let ff0 = getFFInputs(q_ps[1], q_ns[1], ffType);
+            IN1_A[idx] = ff1[0]; IN1_B[idx] = ff1[1] !== null ? ff1[1] : 'X';
+            IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1] !== null ? ff0[1] : 'X';
+        }
+        
+        if (!isMoore) {
             let zval = tableData[i].z;
             Z[idx] = (zval === '1' || zval === '0') ? zval : 'X';
         }
-
-        let eq1A = ffCount===1 ? '' : minimizeLogicExact(IN1_A, currentInVar, currentNumVars);
-        let eq1B = (ffCount===1 || isSinglePin) ? null : minimizeLogicExact(IN1_B, currentInVar, currentNumVars);
-        let eq0A = minimizeLogicExact(IN0_A, currentInVar, currentNumVars);
-        let eq0B = isSinglePin ? null : minimizeLogicExact(IN0_B, currentInVar, currentNumVars);
-        let eqZ  = minimizeLogicExact(Z, currentInVar, currentNumVars);
-
-        if(ffCount > 1) document.getElementById('eq-1A').innerHTML = eq1A;
-        if(ffCount > 1 && !isSinglePin) document.getElementById('eq-1B').innerHTML = eq1B;
-        document.getElementById('eq-0A').innerHTML = eq0A;
-        if(!isSinglePin) document.getElementById('eq-0B').innerHTML = eq0B;
-        document.getElementById('eq-z').innerHTML  = eqZ;
-        
-        kmapData = {}; 
-        if(ffCount > 1) {
-            kmapData['1A'] = { array: IN1_A, eq: eq1A, label: lbl1A };
-            if(!isSinglePin) kmapData['1B'] = { array: IN1_B, eq: eq1B, label: lbl1B };
-        }
-        kmapData['0A'] = { array: IN0_A, eq: eq0A, label: lbl0A };
-        if(!isSinglePin) kmapData['0B'] = { array: IN0_B, eq: eq0B, label: lbl0B };
-        kmapData['Z']  = { array: Z, eq: eqZ, label: outVar };
-
-        renderKMapTemplate(currentNumVars, currentInVar);
-        selectKMap(currentKMapTab);
-        
-        drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, currentInVar, isSinglePin, lbl1A, lbl1B, lbl0A, lbl0B, ffCount);
     }
 
-    // Quine-McCluskey 窮舉化簡
-    function minimizeLogicExact(outputs, varName, numVars) {
-        let ones = [], zeros = []; let maxVal = 1 << numVars;
-        for(let i=0; i<maxVal; i++) { if(outputs[i] === '1') ones.push(i); else if(outputs[i] === '0') zeros.push(i); }
-        if(ones.length === 0) return '0'; if(zeros.length === 0) return '1';
-
-        let implicants = [];
-        const generate = (prefix, length) => { if(prefix.length === length) { implicants.push(prefix); return; } for(let c of ['0','1','-']) generate(prefix + c, length); };
-        generate('', numVars);
-
-        let valid = implicants.filter(imp => { for(let z of zeros) { let zStr = z.toString(2).padStart(numVars, '0'); let match = true; for(let i=0; i<numVars; i++) { if(imp[i] !== '-' && imp[i] !== zStr[i]) { match = false; break; } } if(match) return false; } return true; });
-        let primes = valid.filter(imp => { for(let i=0; i<numVars; i++) { if(imp[i] !== '-') { let expanded = imp.substring(0,i) + '-' + imp.substring(i+1); if(valid.includes(expanded)) return false; } } return true; });
-
-        let bestSubset = []; let minCost = Infinity; let nPrimes = primes.length;
-        for(let i=1; i < (1<<nPrimes); i++) {
-            let subset = []; for(let j=0; j<nPrimes; j++) { if(i & (1<<j)) subset.push(primes[j]); }
-            let covered = new Set();
-            for(let imp of subset) { for(let o of ones) { let oStr = o.toString(2).padStart(numVars, '0'); let match = true; for(let k=0; k<numVars; k++) { if(imp[k] !== '-' && imp[k] !== oStr[k]) { match = false; break; } } if(match) covered.add(o); } }
-            if(covered.size === ones.length) {
-                let cost = subset.length * 10; for(let imp of subset) { for(let k=0; k<numVars; k++) if(imp[k] !== '-') cost += 1; }
-                if(cost < minCost) { minCost = cost; bestSubset = subset; }
+    if (isMoore) {
+        sortedStates.forEach(s => {
+            if (!stateMap[s]) return;
+            let zVal = mooreZMap[s] || '0';
+            let q_ps = stateMap[s];
+            for (let x = 0; x < 2; x++) {
+                let idx = ffCount === 1 ? ((q_ps[0]<<1) | x) : ((q_ps[0]<<2) | (q_ps[1]<<1) | x);
+                if (idx >= 0 && idx < size) Z[idx] = zVal;
             }
-        }
-
-        return bestSubset.map(imp => {
-            let terms = [];
-            if(numVars === 3) {
-                if(imp[0] === '1') terms.push('Q1');    if(imp[0] === '0') terms.push("Q1'");
-                if(imp[1] === '1') terms.push('Q0');    if(imp[1] === '0') terms.push("Q0'");
-                if(imp[2] === '1') terms.push(varName); if(imp[2] === '0') terms.push(varName+"'");
-            } else {
-                if(imp[0] === '1') terms.push('Q0');    if(imp[0] === '0') terms.push("Q0'");
-                if(imp[1] === '1') terms.push(varName); if(imp[1] === '0') terms.push(varName+"'");
-            }
-            if(terms.length === 0) return '1';
-            return terms.join(' · ');
-        }).join(' + ');
+        });
     }
 
-    // ==========================================
-    // SVG 自動佈線繪製引擎
-    // ==========================================
-    function drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, inVar, isSinglePin, l1A, l1B, l0A, l0B, ffCount) {
-        let svg = '';
-        const busMap = { [inVar]: 30, [inVar+"'"]: 50, "Q1": 70, "Q1'": 90, "Q0": 110, "Q0'": 130 };
-        const color = "#999"; 
-        
-        function drawSOP(equation, targetX, targetY, labelText, routeClass) {
-            if (!equation) return ''; 
-            let html = '';
-            const baseClass = `routed-element route-${routeClass}`;
+    let eq1A = ffCount === 1 ? '' : minimizeLogicExact(IN1_A, currentInVar, currentNumVars);
+    let eq1B = (ffCount === 1 || isSinglePin) ? null : minimizeLogicExact(IN1_B, currentInVar, currentNumVars);
+    let eq0A = minimizeLogicExact(IN0_A, currentInVar, currentNumVars);
+    let eq0B = isSinglePin ? null : minimizeLogicExact(IN0_B, currentInVar, currentNumVars);
+    let eqZ  = minimizeLogicExact(Z, currentInVar, currentNumVars);
 
-            if (equation === "0" || equation === "1") {
-                html += `<text x="${targetX - 25}" y="${targetY - 5}" font-size="12" fill="${color}" class="${baseClass}">${equation}</text>`;
-                html += `<line class="animated-wire ${baseClass}" x1="${targetX - 30}" y1="${targetY}" x2="${targetX}" y2="${targetY}" stroke="${color}"/>`;
-                return html;
-            }
-            
-            let terms = equation.split(' + '); let orX = targetX - 50; let andX = targetX - 130;
-            const drawWire = (x1, y1, x2, y2) => { let path = `M ${x1} ${y1}`; if (x1 !== x2 && y1 !== y2) { path += ` L ${x2} ${y1} L ${x2} ${y2}`; } else { path += ` L ${x2} ${y2}`; } return `<path d="${path}" class="animated-wire ${baseClass}" stroke="${color}"/>`; };
-            const drawDot = (x, y) => `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}" class="animated-gate ${baseClass}"/>`;
-            const gateAND = (x, y) => `<path d="M ${x-25} ${y-12} L ${x-5} ${y-12} A 12 12 0 0 1 ${x-5} ${y+12} L ${x-25} ${y+12} Z" fill="var(--svg-bg)" stroke="${color}" stroke-width="1.5" class="animated-gate ${baseClass}"/>`;
-            const gateOR = (x, y) => `<path d="M ${x-25} ${y-15} Q ${x-10} ${y-15} ${x} ${y} Q ${x-10} ${y+15} ${x-25} ${y+15} Q ${x-15} ${y} ${x-25} ${y-15} Z" fill="var(--svg-bg)" stroke="${color}" stroke-width="1.5" class="animated-gate ${baseClass}"/>`;
-            
-            html += `<text x="${targetX - 30}" y="${targetY - 15}" class="highlight-lbl animated-gate ${baseClass}" fill="${color}">${labelText}=${equation}</text>`;
-            
-            if (terms.length === 1) { 
-                let vars = terms[0].split(' · ');
-                if (vars.length === 1) { html += drawWire(busMap[vars[0]], targetY, targetX, targetY); html += drawDot(busMap[vars[0]], targetY); } 
-                else { html += gateAND(targetX - 20, targetY); html += drawWire(targetX - 20, targetY, targetX, targetY); vars.forEach((v, i) => { let inY = targetY + (i === 0 ? -6 : 6); html += drawWire(busMap[v], inY, targetX - 45, inY); html += drawDot(busMap[v], inY); }); }
-            } else { 
-                html += gateOR(orX, targetY); html += drawWire(orX, targetY, targetX, targetY);
-                terms.forEach((term, i) => {
-                    let termY = targetY + (i === 0 ? -25 : 25); let orInY = targetY + (i === 0 ? -8 : 8); let vars = term.split(' · ');
-                    if (vars.length === 1) { html += drawWire(busMap[vars[0]], termY, orX - 20, termY); html += `<path d="M ${orX-20} ${termY} L ${orX-20} ${orInY}" class="animated-wire ${baseClass}" stroke="${color}"/>`; html += drawDot(busMap[vars[0]], termY); } 
-                    else { html += gateAND(andX, termY); html += `<path d="M ${andX} ${termY} L ${andX+15} ${termY} L ${andX+15} ${orInY} L ${orX-20} ${orInY}" class="animated-wire ${baseClass}" stroke="${color}"/>`; vars.forEach((v, vi) => { let inY = termY + (vi === 0 ? -6 : 6); html += drawWire(busMap[v], inY, andX - 25, inY); html += drawDot(busMap[v], inY); }); }
-                });
-            } return html;
-        }
-        
-        if (ffCount > 1) {
-            const y1A = isSinglePin ? 155 : 130;
-            svg += drawSOP(eq1A, 420, y1A, l1A, '1A'); 
-            if(!isSinglePin) svg += drawSOP(eq1B, 420, 180, l1B, '1B');
-        }
-        const y0A = isSinglePin ? 335 : 310;
-        svg += drawSOP(eq0A, 420, y0A, l0A, '0A'); 
-        if(!isSinglePin) svg += drawSOP(eq0B, 420, 360, l0B, '0B');
-        
-        svg += drawSOP(eqZ,  560, 450, 'Z', 'Z');
-        
-        document.getElementById('dynamic-routing-layer').innerHTML = svg;
+    let e1A=document.getElementById('eq-1A'); if(e1A&&ffCount>1) { e1A.innerHTML=`<span class="var-text">${eq1A}</span>`; e1A.setAttribute('data-eq', eq1A); }
+    let e1B=document.getElementById('eq-1B'); if(e1B&&ffCount>1&&!isSinglePin) { e1B.innerHTML=`<span class="var-text">${eq1B}</span>`; e1B.setAttribute('data-eq', eq1B); }
+    let e0A=document.getElementById('eq-0A'); if(e0A) { e0A.innerHTML=`<span class="var-text">${eq0A}</span>`; e0A.setAttribute('data-eq', eq0A); }
+    let e0B=document.getElementById('eq-0B'); if(e0B&&!isSinglePin) { e0B.innerHTML=`<span class="var-text">${eq0B}</span>`; e0B.setAttribute('data-eq', eq0B); }
+    let eZ =document.getElementById('eq-z');  if(eZ)  { eZ.innerHTML =`<span class="var-text">${eqZ}</span>`; eZ.setAttribute('data-eq', eqZ); }
+
+    kmapData = {};
+    if (ffCount > 1) {
+        kmapData['1A'] = { array: IN1_A, eq: eq1A, label: lbl1A };
+        if (!isSinglePin) kmapData['1B'] = { array: IN1_B, eq: eq1B, label: lbl1B };
     }
+    kmapData['0A'] = { array: IN0_A, eq: eq0A, label: lbl0A };
+    if (!isSinglePin) kmapData['0B'] = { array: IN0_B, eq: eq0B, label: lbl0B };
+    kmapData['Z']  = { array: Z, eq: eqZ, label: outVar };
 
-    window.onload = () => {
-        updateRowCount();
-        loadExample();
+    renderKMapTemplate(currentNumVars, currentInVar);
+    selectKMap(currentKMapTab);
+
+    drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, currentInVar, isSinglePin, lbl1A, lbl1B, lbl0A, lbl0B, ffCount);
+}
+
+// ================================================================
+// 即時電路圖繪製
+// ================================================================
+function drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, inVar, isSinglePin, l1A, l1B, l0A, l0B, ffCount) {
+    const layer = document.getElementById('dynamic-routing-layer');
+    if (!layer) return;
+    let svg = '';
+    const busMap = {
+        [inVar]: 50, [inVar+"'"]: 90,
+        'Q1': 140, "Q1'": 180,
+        'Q0': 220, "Q0'": 260
     };
+    const color = "#999";
+
+    function drawSOP(equation, targetX, targetY, labelText, routeClass) {
+        if (!equation) return '';
+        let wiresHTML = '', gatesHTML = '';
+        const bc = `routed-element route-${routeClass}`;
+
+        if (equation === "0" || equation === "1") {
+            gatesHTML += `<text x="${targetX-25}" y="${targetY-5}" font-size="12" fill="${color}" class="${bc}">${equation}</text>`;
+            wiresHTML += `<line class="animated-wire ${bc}" x1="${targetX-30}" y1="${targetY}" x2="${targetX}" y2="${targetY}" stroke="${color}"/>`;
+            return wiresHTML + gatesHTML;
+        }
+
+        let terms = equation.split(' + ');
+        let orX = targetX - 50;
+        let andX = targetX - 130;
+
+        const drawWire = (x1, y1, x2, y2) => {
+            if (x1 === x2 || y1 === y2) {
+                return `<line class="animated-wire ${bc}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}"/>`;
+            }
+            return `<path d="M${x1},${y1} L${x2},${y1} L${x2},${y2}" class="animated-wire ${bc}" stroke="${color}" fill="none"/>`;
+        };
+        const drawDot = (x, y) => `<circle cx="${x}" cy="${y}" r="3" fill="${color}" class="animated-gate ${bc}"/>`;
+        const gateAND = (x, y) => `<path d="M${x-25},${y-12} L${x-5},${y-12} A12,12 0 0,1 ${x-5},${y+12} L${x-25},${y+12} Z" fill="#ffffff" stroke="${color}" stroke-width="1.5" class="animated-gate ${bc}"/>`;
+        const gateOR  = (x, y, n) => {
+            let h = Math.max(16, n*11);
+            return `<path d="M${x-25},${y-h} Q${x-10},${y-h} ${x},${y} Q${x-10},${y+h} ${x-25},${y+h} Q${x-15},${y} ${x-25},${y-h} Z" fill="#ffffff" stroke="${color}" stroke-width="1.5" class="animated-gate ${bc}"/>`;
+        };
+
+        gatesHTML += `<text x="${targetX-10}" y="${targetY-18}" text-anchor="middle" font-weight="bold" font-size="12" class="animated-gate ${bc}" fill="${color}">${labelText}</text>`;
+
+        if (terms.length === 1) {
+            let vars = terms[0].split(' · ');
+            if (vars.length === 1) {
+                if (busMap[vars[0]] !== undefined) {
+                    wiresHTML += drawWire(busMap[vars[0]], targetY, targetX, targetY);
+                    gatesHTML += drawDot(busMap[vars[0]], targetY);
+                }
+            } else {
+                gatesHTML += gateAND(targetX-20, targetY);
+                wiresHTML += drawWire(targetX-20, targetY, targetX, targetY);
+                vars.forEach((v, i) => {
+                    let inY = targetY + (i-(vars.length-1)/2)*8;
+                    if (busMap[v] !== undefined) {
+                        wiresHTML += drawWire(busMap[v], inY, targetX-45, inY);
+                        gatesHTML += drawDot(busMap[v], inY);
+                    }
+                });
+            }
+        } else {
+            gatesHTML += gateOR(orX, targetY, terms.length);
+            wiresHTML += drawWire(orX, targetY, targetX, targetY);
+            terms.forEach((term, i) => {
+                let off = (i-(terms.length-1)/2)*45;
+                let termY = targetY + off;
+                let orInY = targetY + off*0.4;
+                let vars = term.split(' · ');
+                if (vars.length === 1) {
+                    if (busMap[vars[0]] !== undefined) {
+                        wiresHTML += drawWire(busMap[vars[0]], termY, orX-20, termY);
+                        let oX2 = orX-20-(i*4);
+                        wiresHTML += `<path d="M${orX-20},${termY} L${oX2},${termY} L${oX2},${orInY} L${orX-20},${orInY}" class="animated-wire ${bc}" stroke="${color}" fill="none"/>`;
+                        gatesHTML += drawDot(busMap[vars[0]], termY);
+                    }
+                } else {
+                    gatesHTML += gateAND(andX, termY);
+                    let aX2 = andX+10+(i*4);
+                    wiresHTML += `<path d="M${andX},${termY} L${aX2},${termY} L${aX2},${orInY} L${orX-20},${orInY}" class="animated-wire ${bc}" stroke="${color}" fill="none"/>`;
+                    vars.forEach((v, vi) => {
+                        let inY = termY + (vi-(vars.length-1)/2)*8;
+                        if (busMap[v] !== undefined) {
+                            wiresHTML += drawWire(busMap[v], inY, andX-25, inY);
+                            gatesHTML += drawDot(busMap[v], inY);
+                        }
+                    });
+                }
+            });
+        }
+        return wiresHTML + gatesHTML;
+    }
+
+    if (ffCount > 1) {
+        svg += drawSOP(eq1A, 580, isSinglePin ? 135 : 115, l1A, '1A');
+        if (!isSinglePin) svg += drawSOP(eq1B, 580, 160, l1B, '1B');
+    }
+    svg += drawSOP(eq0A, 580, isSinglePin ? 305 : 285, l0A, '0A');
+    if (!isSinglePin) svg += drawSOP(eq0B, 580, 330, l0B, '0B');
+    svg += drawSOP(eqZ, 730, 410, 'Z', 'Z');
+    
+    layer.innerHTML = svg;
+}
+
+// ================================================================
+// 狀態轉移圖 (自適應字體大小 + 完美視角)
+// ================================================================
+function drawStateDiagram() {
+    const svg = document.getElementById('state-diagram-svg');
+    if (!svg) return;
+    const data = getTableData();
+    
+    const stateSet = new Set();
+    data.forEach(d => {
+        if (d.ps) stateSet.add(String(d.ps).trim().toUpperCase());
+        if (d.ns) stateSet.add(String(d.ns).trim().toUpperCase());
+    });
+    const states = Array.from(stateSet).filter(s => s !== "").sort();
+    
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    const n = states.length;
+    if (n === 0) { svg.innerHTML = ''; return; }
+
+    const radius = 100; 
+    const cx = 200, cy = 140; 
+    const coords = {};
+    const angleStep = (2 * Math.PI) / n;
+    
+    states.forEach((s, i) => {
+        const angle = -Math.PI / 2 + i * angleStep;
+        coords[s] = { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+    });
+
+    const colors = { "A": "#d9534f", "B": "#5bc0de", "C": "#5cb85c", "D": "#f0ad4e" };
+
+    const transitions = {};
+    data.forEach(d => {
+        if (!d.ps || !d.ns) return;
+        const ps = String(d.ps).trim().toUpperCase();
+        const ns = String(d.ns).trim().toUpperCase();
+        if (!coords[ps] || !coords[ns]) return;
+        
+        const key = ps + '->' + ns;
+        const label = isMoore ? d.x : `${d.x}/${d.z}`;
+        if (!transitions[key]) transitions[key] = new Set();
+        transitions[key].add(label);
+    });
+
+    const r = 32; 
+
+    let html = `<defs>
+        <marker id="arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,-4 L10,0 L0,4 z" fill="var(--text-muted)"/>
+        </marker>
+    </defs>`;
+
+    const safeId = (str) => String(str).replace(/[^a-zA-Z0-9]/g, '_');
+
+    for (let key in transitions) {
+        const [from, to] = key.split('->');
+        const start = coords[from];
+        const end   = coords[to];
+        const label = Array.from(transitions[key]).join(', ');
+
+        const edgeId = `edge-${safeId(from)}-${safeId(to)}`;
+
+        if (from === to) {
+            let outAngle = n > 1 ? Math.atan2(start.y - cy, start.x - cx) : -Math.PI / 2;
+            
+            const sx = start.x + r * Math.cos(outAngle - 0.5);
+            const sy = start.y + r * Math.sin(outAngle - 0.5);
+            const ex = start.x + r * Math.cos(outAngle + 0.5);
+            const ey = start.y + r * Math.sin(outAngle + 0.5);
+            
+            const cp1x = start.x + (r + 65) * Math.cos(outAngle - 0.9);
+            const cp1y = start.y + (r + 65) * Math.sin(outAngle - 0.9);
+            const cp2x = start.x + (r + 65) * Math.cos(outAngle + 0.9);
+            const cp2y = start.y + (r + 65) * Math.sin(outAngle + 0.9);
+
+            html += `<path id="${edgeId}" d="M${sx},${sy} C${cp1x},${cp1y} ${cp2x},${cp2y} ${ex},${ey}" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)"/>`;
+            
+            const textX = start.x + (r + 75) * Math.cos(outAngle);
+            const textY = start.y + (r + 75) * Math.sin(outAngle) + 5;
+            
+            html += `<text x="${textX}" y="${textY}" text-anchor="middle" font-size="14" font-family="monospace" fill="var(--text-main)" font-weight="bold">${label}</text>`;
+        } else {
+            const reverseKey = to + '->' + from;
+            const hasReverse = transitions[reverseKey] !== undefined;
+
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const dist = Math.hypot(dx, dy);
+            const ux = dx / dist, uy = dy / dist;
+            const px = -uy, py = ux; 
+
+            const offset = hasReverse ? 38 : 20; 
+
+            const cpX = (start.x + end.x) / 2 + px * offset;
+            const cpY = (start.y + end.y) / 2 + py * offset;
+
+            const aStart = Math.atan2(cpY - start.y, cpX - start.x);
+            const aEnd   = Math.atan2(cpY - end.y,   cpX - end.x);
+
+            const sx = start.x + r * Math.cos(aStart);
+            const sy = start.y + r * Math.sin(aStart);
+            const ex = end.x   + r * Math.cos(aEnd);
+            const ey = end.y   + r * Math.sin(aEnd);
+
+            html += `<path id="${edgeId}" d="M${sx},${sy} Q${cpX},${cpY} ${ex},${ey}" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)"/>`;
+
+            const lblOffX = px * (offset + 12);
+            const lblOffY = py * (offset + 12);
+            
+            html += `<text x="${(start.x+end.x)/2 + lblOffX}" y="${(start.y+end.y)/2 + lblOffY + 5}" text-anchor="middle" font-size="14" font-family="monospace" fill="var(--text-main)" font-weight="bold">${label}</text>`;
+        }
+    }
+
+    states.forEach((s, idx) => {
+        const c = coords[s];
+        // 如果不是 A,B,C,D，自動給其他顏色
+        const palette = ["#d9534f", "#5bc0de", "#5cb85c", "#f0ad4e", "#8e44ad", "#e67e22"];
+        let col = colors[s] || palette[idx % palette.length];
+        
+        const mooreZ = data.find(d => d.ps && d.ps.trim().toUpperCase() === s)?.z || '0';
+
+        html += `<circle id="node-${safeId(s)}" cx="${c.x}" cy="${c.y}" r="${r}" fill="var(--bg-panel)" stroke="${col}" stroke-width="3.5"/>`;
+        
+        // 🔥 自動縮放超長狀態名稱
+        if (isMoore) {
+            let fSize = 16;
+            if (s.length > 4) fSize = 9;
+            else if (s.length > 2) fSize = 11;
+            
+            html += `<text x="${c.x}" y="${c.y-4}" text-anchor="middle" font-weight="800" font-size="${fSize}" fill="var(--text-main)">${s}</text>`;
+            html += `<line x1="${c.x-24}" y1="${c.y+4}" x2="${c.x+24}" y2="${c.y+4}" stroke="var(--border-color)" stroke-width="2"/>`;
+            html += `<text x="${c.x}" y="${c.y+22}" text-anchor="middle" font-weight="800" font-size="14" fill="#5cb85c">${mooreZ}</text>`;
+        } else {
+            let fSize = 20;
+            if (s.length > 4) fSize = 11;
+            else if (s.length > 2) fSize = 14;
+            
+            html += `<text x="${c.x}" y="${c.y+6}" text-anchor="middle" font-weight="800" font-size="${fSize}" fill="var(--text-main)">${s}</text>`;
+        }
+    });
+
+    svg.innerHTML = html;
+    svg.setAttribute('viewBox', '0 -80 400 450');
+}
+
+// ================================================================
+// 動態跑馬燈模擬器 & 數位波形分析儀 (Waveform Viewer)
+// ================================================================
+let simInterval = null;
+let waveHistory = []; 
+const safeId = (str) => String(str).replace(/[^a-zA-Z0-9]/g, '_');
+
+function stopSimulation() {
+    if(simInterval) clearInterval(simInterval);
+    document.querySelectorAll('.sim-glow').forEach(el => el.classList.remove('sim-glow'));
+    document.querySelectorAll('.sim-edge-glow').forEach(el => el.classList.remove('sim-edge-glow'));
+    document.querySelectorAll('.active-step').forEach(el => el.classList.remove('active-step'));
+}
+
+function startSimulation() {
+    stopSimulation();
+    waveHistory = []; 
+    document.getElementById('waveform-container').style.display = 'block';
+    
+    const inputEl = document.getElementById('sim-input');
+    const seqStr = inputEl.value.replace(/[^01]/g, ''); 
+    inputEl.value = seqStr;
+    
+    if(!seqStr) {
+        alert("⚠️ 請輸入由 0 或 1 組成的訊號序列！");
+        return;
+    }
+    
+    let currState = document.getElementById('sim-start-state').value;
+    if(!currState) return;
+
+    const data = getTableData();
+    const transMap = {};
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    
+    data.forEach(d => {
+        let ps = String(d.ps).trim().toUpperCase();
+        let ns = String(d.ns).trim().toUpperCase();
+        let x = String(d.x).trim();
+        if(!transMap[ps]) transMap[ps] = {};
+        transMap[ps][x] = { ns: ns, z: String(d.z).trim() };
+    });
+
+    const logContainer = document.getElementById('sim-log');
+    logContainer.innerHTML = '';
+    showToast("⏱️ 時序模擬與波形繪製中...");
+    
+    let i = 0;
+    
+    function stepForward() {
+        document.querySelectorAll('.sim-glow').forEach(el => el.classList.remove('sim-glow'));
+        document.querySelectorAll('.sim-edge-glow').forEach(el => el.classList.remove('sim-edge-glow'));
+        document.querySelectorAll('.active-step').forEach(el => el.classList.remove('active-step'));
+
+        if (i >= seqStr.length) {
+            let finalNode = document.getElementById(`node-${safeId(currState)}`);
+            if(finalNode) finalNode.classList.add('sim-glow');
+            logContainer.innerHTML += `<div class="sim-step-box" style="border-color:var(--accent-green);">
+                <span style="font-size:10px; color:var(--accent-green);">FINISH</span>
+                <span style="font-size:16px;">${currState}</span>
+            </div>`;
+            logContainer.scrollLeft = logContainer.scrollWidth;
+            clearInterval(simInterval);
+            showToast("✅ 模擬序列執行完畢！");
+            return;
+        }
+
+        let x = seqStr[i];
+        let nextStepInfo = transMap[currState] ? transMap[currState][x] : null;
+        
+        if(!nextStepInfo) {
+            logContainer.innerHTML += `<div class="sim-step-box" style="border-color:var(--accent-red); color:var(--accent-red);">
+                <span style="font-size:10px;">ERROR</span>
+                <span>無 ${x} 路徑</span>
+            </div>`;
+            clearInterval(simInterval);
+            return;
+        }
+
+        let nodeEl = document.getElementById(`node-${safeId(currState)}`);
+        let edgeEl = document.getElementById(`edge-${safeId(currState)}-${safeId(nextStepInfo.ns)}`);
+        
+        if(nodeEl) nodeEl.classList.add('sim-glow');
+        if(edgeEl) edgeEl.classList.add('sim-edge-glow');
+
+        let zOut = isMoore ? (data.find(d => String(d.ps).trim().toUpperCase() === currState)?.z || '0') : nextStepInfo.z;
+        let zColor = zOut === '1' ? 'var(--accent-red)' : 'var(--text-main)';
+
+        let q_vals = stateMapGlobal[currState];
+        if (q_vals) {
+            let ffCount = Object.values(stateMapGlobal)[0].length;
+            waveHistory.push({
+                x: parseInt(x),
+                q1: ffCount > 1 ? q_vals[0] : 0,
+                q0: ffCount > 1 ? q_vals[1] : q_vals[0],
+                z: parseInt(zOut)
+            });
+            drawWaveform(waveHistory, ffCount); 
+        }
+
+        let logHtml = `<div class="sim-step-box active-step">
+            <span style="font-size:10px; color:var(--text-muted);">${currState} (X=${x})</span>
+            <span style="color:${zColor}; font-size:16px;">Z = ${zOut}</span>
+        </div>
+        <div style="align-self:center; color:var(--text-muted); font-size:16px;">➔</div>`;
+        
+        logContainer.innerHTML += logHtml;
+        logContainer.scrollLeft = logContainer.scrollWidth;
+
+        currState = nextStepInfo.ns;
+        i++;
+    }
+
+    stepForward(); 
+    simInterval = setInterval(stepForward, 800); 
+}
+
+function drawWaveform(history, ffCount) {
+    const svg = document.getElementById('waveform-svg');
+    const container = document.getElementById('waveform-container');
+    if(!svg || history.length === 0) return;
+
+    const stepW = 50; 
+    const amp = 25;   
+    const trackH = 45; 
+    const startX = 60;
+    
+    let signals = [];
+    signals.push({ name: 'CLK', data: 'clk' });
+    signals.push({ name: 'X', data: history.map(h => h.x) });
+    if(ffCount > 1) signals.push({ name: 'Q1', data: history.map(h => h.q1) });
+    signals.push({ name: 'Q0', data: history.map(h => h.q0) });
+    signals.push({ name: 'Z', data: history.map(h => h.z) });
+
+    const totalW = Math.max(container.clientWidth, startX + history.length * stepW + 50);
+    const totalH = signals.length * trackH + 20;
+    svg.setAttribute('width', totalW);
+    svg.setAttribute('height', totalH);
+
+    let html = '';
+    
+    for(let i=0; i<history.length; i++) {
+        let cx = startX + i * stepW;
+        html += `<line x1="${cx}" y1="0" x2="${cx}" y2="${totalH}" stroke="var(--border-color)" stroke-dasharray="2 2" />`;
+        html += `<text x="${cx + stepW/2}" y="${totalH - 5}" font-size="10" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">T${i}</text>`;
+    }
+
+    signals.forEach((sig, idx) => {
+        let baseY = 30 + idx * trackH;
+        html += `<text x="10" y="${baseY - amp/2 + 4}" font-size="13" font-weight="800" fill="var(--accent-purple)">${sig.name}</text>`;
+        html += `<line x1="${startX}" y1="${baseY}" x2="${totalW}" y2="${baseY}" stroke="var(--border-color)" stroke-width="1"/>`;
+
+        if(sig.name === 'CLK') {
+            let d = `M ${startX}, ${baseY}`;
+            for(let i=0; i<history.length; i++) {
+                let nx = startX + i*stepW;
+                d += ` L ${nx+10}, ${baseY} L ${nx+10}, ${baseY-amp} L ${nx+40}, ${baseY-amp} L ${nx+40}, ${baseY} L ${nx+stepW}, ${baseY}`;
+            }
+            html += `<path d="${d}" fill="none" stroke="var(--text-muted)" stroke-width="2" />`;
+        } else {
+            let d = `M ${startX}, ${baseY - sig.data[0]*amp}`;
+            for(let i=0; i<sig.data.length; i++) {
+                let val = sig.data[i];
+                let nx = startX + i*stepW;
+                d += ` L ${nx + stepW}, ${baseY - val*amp}`;
+                if(i < sig.data.length - 1 && sig.data[i+1] !== val) {
+                    d += ` L ${nx + stepW}, ${baseY - sig.data[i+1]*amp}`;
+                }
+            }
+            let color = sig.name === 'Z' ? 'var(--accent-green)' : (sig.name === 'X' ? 'var(--accent-red)' : 'var(--accent-blue)');
+            html += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" />`;
+            
+            sig.data.forEach((val, i) => {
+                let cx = startX + i*stepW + stepW/2;
+                let cy = baseY - val*amp;
+                html += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--bg-panel)" stroke="${color}" stroke-width="2"/>`;
+            });
+        }
+    });
+
+    svg.innerHTML = html;
+    container.scrollLeft = container.scrollWidth;
+}
+
+// ================================================================
+// 匯出 Verilog 程式碼
+// ================================================================
+function exportVerilog() {
+    const inVar = document.getElementById('input-var').value || 'X';
+    const outVar = document.getElementById('output-var').value || 'Z';
+    const ffType = document.querySelector('input[name="ff_type"]:checked').value.toUpperCase();
+    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
+    
+    const toV = (eqStr) => {
+        if(!eqStr || eqStr === '...') return "1'b0";
+        if(eqStr === '1') return "1'b1";
+        if(eqStr === '0') return "1'b0";
+        return eqStr.replace(/([a-zA-Z0-9]+)'/g, '~$1')
+                    .replace(/·/g, '&')
+                    .replace(/\+/g, '|');
+    };
+
+    let getEqStr = (id) => {
+        let el = document.getElementById(id);
+        return el ? el.getAttribute('data-eq') || '' : '';
+    };
+
+    let eq1A = getEqStr('eq-1A');
+    let eq1B = getEqStr('eq-1B');
+    let eq0A = getEqStr('eq-0A');
+    let eq0B = getEqStr('eq-0B');
+    let eqZ  = getEqStr('eq-z');
+
+    let hasQ1 = eq1A !== '';
+    let qDef = hasQ1 ? `reg Q1, Q0;` : `reg Q0;`;
+    let ffCount = hasQ1 ? 2 : 1;
+
+    let vCode = `// ==========================================\n`;
+    vCode += `// Generated by Sequential Circuit EDA\n`;
+    vCode += `// Model: ${isMoore ? 'Moore' : 'Mealy'} Machine\n`;
+    vCode += `// Flip-Flop: ${ffType}-FF\n`;
+    vCode += `// ==========================================\n\n`;
+
+    vCode += `module seq_circuit(\n`;
+    vCode += `    input clk,\n`;
+    vCode += `    input rst,\n`;
+    vCode += `    input ${inVar},\n`;
+    vCode += `    output ${outVar}\n`;
+    vCode += `);\n\n`;
+
+    // 🔥 加上專業的 localparam 狀態宣告
+    if (Object.keys(stateMapGlobal).length > 0) {
+        vCode += `    // State Encodings\n`;
+        for (let s in stateMapGlobal) {
+            let bits = stateMapGlobal[s].join('');
+            vCode += `    localparam ${s} = ${ffCount}'b${bits};\n`;
+        }
+        vCode += `\n`;
+    }
+
+    vCode += `    // State Variables\n`;
+    vCode += `    ${qDef}\n\n`;
+
+    vCode += `    // Output Logic\n`;
+    vCode += `    assign ${outVar} = ${toV(eqZ)};\n\n`;
+
+    vCode += `    // State Transition Logic (${ffType}-FF)\n`;
+    vCode += `    always @(posedge clk or posedge rst) begin\n`;
+    vCode += `        if (rst) begin\n`;
+    if(hasQ1) vCode += `            Q1 <= 1'b0;\n`;
+    vCode += `            Q0 <= 1'b0;\n`;
+    vCode += `        end else begin\n`;
+
+    if(ffType === 'D') {
+        if(hasQ1) vCode += `            Q1 <= ${toV(eq1A)};\n`;
+        vCode += `            Q0 <= ${toV(eq0A)};\n`;
+    } else if(ffType === 'T') {
+        if(hasQ1) vCode += `            Q1 <= (${toV(eq1A)}) ? ~Q1 : Q1;\n`;
+        vCode += `            Q0 <= (${toV(eq0A)}) ? ~Q0 : Q0;\n`;
+    } else if(ffType === 'JK') {
+        if(hasQ1) vCode += `            Q1 <= (${toV(eq1A)} & ~Q1) | (~(${toV(eq1B)}) & Q1);\n`;
+        vCode += `            Q0 <= (${toV(eq0A)} & ~Q0) | (~(${toV(eq0B)}) & Q0);\n`;
+    } else if(ffType === 'SR') {
+        if(hasQ1) vCode += `            Q1 <= ${toV(eq1A)} | (~(${toV(eq1B)}) & Q1);\n`;
+        vCode += `            Q0 <= ${toV(eq0A)} | (~(${toV(eq0B)}) & Q0);\n`;
+    }
+
+    vCode += `        end\n`;
+    vCode += `    end\n\n`;
+    vCode += `endmodule\n`;
+
+    const blob = new Blob([vCode], {type: "text/plain;charset=utf-8"});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "seq_circuit.v";
+    link.click();
+    showToast("💻 Verilog 硬體描述碼 (.v) 匯出成功！");
+}
+
+// ================================================================
+// 初始化
+// ================================================================
+window.onload = () => {
+    updateRowCount();
+    loadExample();
+};
 </script>
 </body>
 </html>
