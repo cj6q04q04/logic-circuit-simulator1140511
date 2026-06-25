@@ -40,11 +40,10 @@
             color: var(--text-main);
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .app-wrapper { display: flex; height: 100vh; width: 100vw; }
+        .app-wrapper { display: flex; height: 100vh; width: 100vw; position: relative; }
         .control-panel {
             width: 45%; height: 100%; overflow-y: auto; padding: 20px;
-            box-sizing: border-box; border-right: 2px solid var(--border-color);
-            background: var(--bg-body);
+            box-sizing: border-box; background: var(--bg-body);
             transition: background-color 0.3s ease;
         }
         .visual-panel {
@@ -53,6 +52,21 @@
             gap: 15px; overflow-y: auto;
             transition: background-color 0.3s ease;
         }
+        
+        /* 左右拖曳分隔線樣式 */
+        .splitter {
+            width: 6px;
+            height: 100%;
+            background: var(--border-color);
+            cursor: col-resize;
+            transition: background 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+        .splitter:hover, .splitter:active {
+            background: var(--accent-blue);
+        }
+
         .main-title { 
             font-family: 'Times New Roman', serif; font-size: 30px; 
             margin: 0; color: var(--text-muted);
@@ -75,7 +89,6 @@
         table.data-table th, table.data-table td { border: 1px solid var(--border-color); padding: 6px; }
         table.data-table th { background: rgba(0,0,0,0.02); font-weight: 700; }
         
-        /* 🔥 自訂狀態名稱可編輯樣式 */
         .editable-cell {
             cursor: text; font-weight: 800; color: var(--primary);
             text-transform: uppercase; transition: all 0.2s ease;
@@ -187,7 +200,7 @@
             ⚙️ Step 1. 設定模型與 <b>自訂狀態編碼</b> (Binary/Gray Code)。
         </div>
         <div class="tour-step" style="border-left-color: var(--accent-blue);">
-            📊 Step 2. <b>直接點擊表格內的「A, B, C」</b>，可以隨意更改為 IDLE, EXEC 等自訂狀態名稱！
+            📊 Step 2. <b>直接點擊表格內的「A, B, C」</b>，修改完成後點擊外面或 Enter，電路即時更新！
         </div>
         <div class="tour-step" style="border-left-color: var(--accent-purple);">
             ✨ Step 3. 觀看即時電路與狀態圖，底部還能 <b>動態跑馬燈模擬</b> 並匯出硬體碼！
@@ -199,7 +212,6 @@
 <div id="toast-container"></div>
 
 <div class="app-wrapper">
-    <!-- 加入 ID: left-panel -->
     <div class="control-panel" id="left-panel">
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: baseline; gap: 12px;">
@@ -210,20 +222,20 @@
         </div>
         <div class="usage-guide">
             <strong>💡 操作說明：</strong>
-            可以直接點擊狀態表名稱修改。右側電路圖需按住 <b>Ctrl + 滾輪</b> 進行縮放，中間分隔線可 <b>左右拖曳</b> 調整大小喔！
+            可以直接點擊狀態表名稱修改，完成後點擊外部或按 <b>Enter</b> 即可。右側電路圖需按住 <b>Ctrl + 滾輪</b> 進行縮放，中間分隔線可 <b>左右拖曳</b> 調整大小喔！
         </div>
         <div class="section-box" style="border-top: 4px solid var(--accent-red);">
             <div class="box-title" style="color: var(--accent-red);">⚙ 1. System Setup</div>
             <div style="display: flex; gap: 20px; font-size: 13px; font-weight: 600; margin-bottom: 10px; flex-wrap: wrap;">
                 <div>模型：
-                    <input type="radio" name="model" value="mealy" checked onchange="triggerUpdate()"> Mealy
-                    <input type="radio" name="model" value="moore" onchange="triggerUpdate()"> Moore
+                    <input type="radio" name="model" value="mealy" checked onchange="debounceUpdate()"> Mealy
+                    <input type="radio" name="model" value="moore" onchange="debounceUpdate()"> Moore
                 </div>
                 <div>FF：
-                    <input type="radio" name="ff_type" value="jk" onchange="triggerUpdate()"> JK
-                    <input type="radio" name="ff_type" value="sr" onchange="triggerUpdate()"> SR
-                    <input type="radio" name="ff_type" value="d" onchange="triggerUpdate()"> D
-                    <input type="radio" name="ff_type" value="t" checked onchange="triggerUpdate()"> T
+                    <input type="radio" name="ff_type" value="jk" onchange="debounceUpdate()"> JK
+                    <input type="radio" name="ff_type" value="sr" onchange="debounceUpdate()"> SR
+                    <input type="radio" name="ff_type" value="d" onchange="debounceUpdate()"> D
+                    <input type="radio" name="ff_type" value="t" checked onchange="debounceUpdate()"> T
                 </div>
             </div>
             <div style="display: flex; gap: 20px; font-size: 13px; font-weight: 600; flex-wrap: wrap;">
@@ -233,23 +245,23 @@
                     <input type="radio" name="row_count" value="8" onchange="updateRowCount()"> 8 Rows
                 </div>
                 <div style="color: var(--accent-purple);">編碼：
-                    <input type="radio" name="encoding" value="binary" checked onchange="triggerUpdate(); showToast('已套用 Binary 狀態編碼')"> Binary
-                    <input type="radio" name="encoding" value="gray" onchange="triggerUpdate(); showToast('已套用 Gray Code 狀態編碼')"> Gray Code
+                    <input type="radio" name="encoding" value="binary" checked onchange="debounceUpdate(); showToast('已套用 Binary 狀態編碼')"> Binary
+                    <input type="radio" name="encoding" value="gray" onchange="debounceUpdate(); showToast('已套用 Gray Code 狀態編碼')"> Gray Code
                 </div>
             </div>
         </div>
         <div class="section-box" style="border-top: 4px solid var(--accent-blue);">
             <div class="box-title" style="color: var(--accent-blue);">📊 2. State Table & Variables</div>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Input Var</label><br><input type="text" id="input-var" class="var-input" value="X" maxlength="1" oninput="triggerUpdate()"></div>
-                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Output Var</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1" oninput="triggerUpdate()"></div>
+                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Input Var</label><br><input type="text" id="input-var" class="var-input" value="X" maxlength="1"></div>
+                <div style="flex:1;"><label style="font-size: 12px; font-weight:bold;">Output Var</label><br><input type="text" id="output-var" class="var-input" value="Z" maxlength="1"></div>
             </div>
             <div style="font-size: 12px; color: var(--accent-purple); font-family: 'Fira Code', monospace; margin-bottom: 8px; font-weight: bold;" id="state-assign-lbl">...</div>
             <table class="data-table" id="state-table">
                 <thead><tr><th>Present</th><th><span class="dyn-in">X</span></th><th>Next State</th><th id="th-out"><span class="dyn-out">Z</span></th></tr></thead>
                 <tbody></tbody>
             </table>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
                 <button class="action-btn" onclick="clearTable(); showToast('🗑️ 表格已清空')">Clear Table</button>
                 <button class="action-btn" onclick="loadExample(); showToast('🔄 已重置預設範例')">Reset Example</button>
                 <button class="action-btn" style="border-color: var(--accent-purple); color: var(--accent-purple);" onclick="loadPresetMoore(); showToast('💡 已帶入：2位元向上計數器範例')">2-Bit Counter</button>
@@ -307,7 +319,6 @@
             <div class="box-title" style="color: var(--accent-purple);">⏱️ 5. Sequence Simulator (動態模擬)</div>
             <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                 <label style="font-size:12px; font-weight:bold;">初始狀態:</label>
-                <!-- 模擬器的起始狀態現在也會跟著自訂名稱同步 -->
                 <select id="sim-start-state" class="table-select" style="width:100px; color:var(--text-main);"></select>
                 <label style="font-size:12px; font-weight:bold; margin-left:10px;">輸入波形:</label>
                 <input type="text" id="sim-input" class="var-input" placeholder="例如: 10110" style="flex:1; border-color:var(--accent-purple); color:var(--accent-purple);" value="10110">
@@ -325,10 +336,8 @@
                 <svg id="waveform-svg" width="100%" height="200" style="min-width: 100%;"></svg>
             </div>
         </div>
-
     </div>
 
-    <!-- 🔥 新增左右拖曳的分隔線 -->
     <div class="splitter" id="drag-splitter" title="拖曳調整版面大小"></div>
 
     <div class="visual-panel">
@@ -420,7 +429,13 @@
 // ================================================================
 // UI 與 導覽操作
 // ================================================================
+
+// 修正 8: 歡迎導覽記憶機制
+if (localStorage.getItem('hideTour') === 'true') {
+    document.getElementById('welcome-overlay').style.display = 'none';
+}
 function closeTour() {
+    localStorage.setItem('hideTour', 'true');
     document.getElementById('welcome-overlay').style.opacity = '0';
     document.getElementById('tour-modal').style.transform = 'translateY(-20px)';
     setTimeout(() => {
@@ -436,6 +451,37 @@ function showToast(message) {
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
 }
+
+// 修正 2: 左右拖曳分隔線核心綁定
+window.addEventListener('DOMContentLoaded', () => {
+    const splitter = document.getElementById('drag-splitter');
+    const leftPanel = document.getElementById('left-panel');
+    const rightPanel = document.querySelector('.visual-panel');
+
+    if (splitter && leftPanel && rightPanel) {
+        let isResizing = false;
+        splitter.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            let percentage = (e.clientX / window.innerWidth) * 100;
+            if (percentage > 25 && percentage < 75) {
+                leftPanel.style.width = `${percentage}%`;
+                rightPanel.style.width = `${100 - percentage}%`;
+            }
+        });
+        window.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = 'default';
+                document.body.style.userSelect = 'auto';
+            }
+        });
+    }
+});
 
 const svgArea = document.getElementById('circuit-svg');
 const svgGroup = document.getElementById('svg-pan-zoom');
@@ -476,21 +522,36 @@ function resetHighlight() {
     });
 }
 
+// 修正 10: 深色模式切換全面更新 SVG
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     document.querySelectorAll('.svg-text-main').forEach(el => el.setAttribute('fill', isDark ? '#f8f9fa' : '#333333'));
     document.querySelectorAll('.svg-stroke-main').forEach(el => el.setAttribute('stroke', isDark ? '#f8f9fa' : '#333333'));
+    document.querySelectorAll('marker path').forEach(el => el.setAttribute('fill', isDark ? '#adb5bd' : '#666666'));
+    drawStateDiagram(); 
+    debounceUpdate();
 }
 
 // ================================================================
-// 全域狀態
+// 全域狀態與防抖優化
 // ================================================================
 let kmapData = {};
 let currentKMapTab = '0A';
 let currentNumVars = 3;  
 let currentInVar = 'X';
-let stateMapGlobal = {}; // 儲存供波形與匯出使用
+let stateMapGlobal = {}; 
+
+let updateTimer;
+function debounceUpdate() {
+    clearTimeout(updateTimer);
+    updateTimer = setTimeout(() => {
+        triggerUpdate();
+    }, 300);
+}
+
+document.getElementById('input-var').addEventListener('input', debounceUpdate);
+document.getElementById('output-var').addEventListener('input', debounceUpdate);
 
 // ================================================================
 // 狀態表操作
@@ -523,6 +584,7 @@ function getTableData() {
     return data;
 }
 
+// 修正 6: Moore RowSpan 動態計算
 function renderTableHTML(data) {
     const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
     const tbody = document.querySelector('#state-table tbody');
@@ -536,40 +598,77 @@ function renderTableHTML(data) {
     let html = '';
 
     for(let i = 0; i < data.length; i++) {
-        let nsSelect = `<select class="table-select ns-select" onchange="triggerUpdate()">`;
+        let nsSelect = `<select class="table-select ns-select" onchange="debounceUpdate()">`;
         uniqueStates.forEach(s => {
             nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`;
         });
         nsSelect += `</select>`;
 
-        let zSelect = `<select class="table-select z-select" onchange="triggerUpdate()">
+        let zSelect = `<select class="table-select z-select" onchange="debounceUpdate()">
             <option value="0" ${data[i].z === '0' ? 'selected' : ''}>0</option>
             <option value="1" ${data[i].z === '1' ? 'selected' : ''}>1</option>
         </select>`;
 
+        // 計算目前群組的連續筆數，保護 Moore 模式即使手動亂改名稱也能維持表格結構
+        let isFirstOfGroup = (i === 0 || data[i].ps !== data[i-1].ps);
+        let rowSpanCount = 1;
+        if (isFirstOfGroup && isMoore) {
+            for(let j = i + 1; j < data.length; j++) {
+                if (data[j].ps === data[i].ps) rowSpanCount++;
+                else break;
+            }
+        }
+
         html += `<tr>`;
-        // 🔥 加入 editable-cell 樣式與提示，讓自訂狀態更明顯
-        html += `<td class="editable-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱">${data[i].ps}</td>`;
-        html += `<td class="editable-cell" contenteditable="true" style="color:var(--accent-red);">${data[i].x}</td>`;
-        html += `<td>${nsSelect}</td>`;
         if (isMoore) {
-            if (i % 2 === 0) html += `<td rowspan="2" style="vertical-align:middle;">${zSelect}</td>`;
+            if (isFirstOfGroup) {
+                html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱" rowspan="${rowSpanCount}">${data[i].ps}</td>`;
+            }
+            html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);" title="輸入 0 或 1">${data[i].x}</td>`;
+            html += `<td>${nsSelect}</td>`;
+            if (isFirstOfGroup) {
+                html += `<td rowspan="${rowSpanCount}" style="vertical-align:middle;">${zSelect}</td>`;
+            }
         } else {
+            html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱">${data[i].ps}</td>`;
+            html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);" title="輸入 0 或 1">${data[i].x}</td>`;
+            html += `<td>${nsSelect}</td>`;
             html += `<td>${zSelect}</td>`;
         }
         html += `</tr>`;
     }
     tbody.innerHTML = html;
 
-    document.querySelectorAll('.editable-cell').forEach(cell => {
-        cell.addEventListener('input', () => triggerUpdate());
+    // 修正 4: 輸入防呆保護機制 (Validation)
+    document.querySelectorAll('.ps-cell').forEach(cell => {
+        cell.addEventListener('blur', (e) => { 
+            let clean = e.target.innerText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if(e.target.innerText !== clean) {
+                showToast('⚠️ 狀態名稱已移除非法字元');
+                e.target.innerText = clean;
+            }
+            debounceUpdate(); 
+        });
+        cell.addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); cell.blur(); } });
+    });
+
+    document.querySelectorAll('.x-cell').forEach(cell => {
+        cell.addEventListener('blur', (e) => {
+            let val = e.target.innerText.trim();
+            if(val !== '0' && val !== '1' && val !== 'X') {
+                showToast('⚠️ 輸入值只能是 0 或 1，已為您重置');
+                e.target.innerText = '0';
+            }
+            debounceUpdate();
+        });
+        cell.addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); cell.blur(); } });
     });
 }
 
 function handleModelChange() { 
     let data = getTableData(); 
     renderTableHTML(data); 
-    triggerUpdate(); 
+    debounceUpdate(); 
 }
 
 function updateRowCount() {
@@ -582,7 +681,7 @@ function updateRowCount() {
     for(let i = 0; i < count; i++) 
         data.push({ ps: states[i], x: inputs[i], ns: nextSt[i], z: zVals[i] });
     renderTableHTML(data);
-    triggerUpdate();
+    debounceUpdate();
 }
 
 function loadPresetMoore() {
@@ -590,7 +689,6 @@ function loadPresetMoore() {
     document.querySelector('input[name="ff_type"][value="d"]').checked = true;
     document.querySelector('input[name="model"][value="moore"]').checked = true;
     
-    // 🔥 提供直覺的自訂狀態範例
     const data = [
         {ps:'IDLE', x:'0', ns:'IDLE', z:'0'}, {ps:'IDLE', x:'1', ns:'S1', z:'0'}, 
         {ps:'S1',   x:'0', ns:'S1',   z:'1'}, {ps:'S1',   x:'1', ns:'S2', z:'1'}, 
@@ -600,7 +698,7 @@ function loadPresetMoore() {
     document.getElementById('input-var').value  = 'X';
     document.getElementById('output-var').value = 'Z';
     renderTableHTML(data); 
-    triggerUpdate();
+    debounceUpdate();
 }
 
 function enforceMooreSync() {
@@ -610,10 +708,14 @@ function enforceMooreSync() {
     let zMap = {};
     rows.forEach(row => {
         let cells = row.getElementsByTagName('td');
-        if (cells.length < 4) return;
+        if (cells.length < 3) return; // 保護機制
         let ps = cells[0].innerText.trim().toUpperCase();
         if (ps === "") return;
-        let zSelect = cells[cells.length-1].querySelector('select');
+        
+        let zSelect = null;
+        if(cells.length === 4) zSelect = cells[3].querySelector('select'); // Mealy 或 Moore 首行
+        else if(cells.length === 3) zSelect = null; // Moore 的次行沒有 Z 選單
+        
         if (!zSelect) return;
         let val = zSelect.value;
         if (zMap[ps] === undefined) zMap[ps] = val;
@@ -629,7 +731,7 @@ function clearTable() {
     let data = getTableData();
     data.forEach(d => { d.ns = d.ps; d.z = '0'; });
     renderTableHTML(data); 
-    triggerUpdate();
+    debounceUpdate();
 }
 
 function loadExample() {
@@ -644,10 +746,9 @@ function loadExample() {
     document.getElementById('input-var').value  = 'X';
     document.getElementById('output-var').value = 'Z';
     renderTableHTML(data); 
-    triggerUpdate();
+    debounceUpdate();
 }
 
-// 🔥 新增：動態更新下拉選單選項 (當使用者手動修改狀態名稱時，選單要跟著變)
 function updateDynamicDropdowns() {
     const rows = document.querySelectorAll('#state-table tbody tr');
     let uniqueStates = new Set();
@@ -674,7 +775,7 @@ function updateDynamicDropdowns() {
 
 function triggerUpdate() {
     enforceMooreSync();
-    updateDynamicDropdowns(); // 🔥 確保選單在繪製前先同步最新名稱
+    updateDynamicDropdowns(); 
     document.getElementById('dynamic-routing-layer').innerHTML = '';
     setTimeout(() => {
         runLogicSynthesis();
@@ -684,11 +785,11 @@ function triggerUpdate() {
 }
 
 document.querySelectorAll('input[name="model"]').forEach(el => el.addEventListener('change', handleModelChange));
-document.querySelectorAll('input[name="ff_type"], input[name="encoding"], #input-var, #output-var').forEach(el => el.addEventListener('change', triggerUpdate));
+document.querySelectorAll('input[name="ff_type"], input[name="encoding"]').forEach(el => el.addEventListener('change', debounceUpdate));
 document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
 
 // ================================================================
-// ★ 完美移植你的 Q-M 演算法與正反器邏輯
+// 原汁原味保留的 Q-M 演算法與正反器邏輯
 // ================================================================
 function getFFInputs(q, nq, type) {
     let curr = Number(q);
@@ -865,19 +966,23 @@ function runLogicSynthesis() {
         if (d.ns) uniqueStates.add(d.ns.toUpperCase());
     });
     
+    // 修正 5: 超過四個狀態加入提醒
     let sortedStates = Array.from(uniqueStates).filter(s => s !== "").sort();
-    if (sortedStates.length > 4) sortedStates = sortedStates.slice(0, 4);
+    if (sortedStates.length > 4) {
+        showToast("⚠️ 警告：輸入狀態數量超過 4 個，系統僅能正確編碼前四個狀態！");
+        sortedStates = sortedStates.slice(0, 4);
+    }
 
     let ffCount = sortedStates.length <= 2 ? 1 : 2;
     currentNumVars = ffCount + 1;
 
-    // 🔥 支援 Binary 與 Gray Code 動態編碼
+    // 修正 1: Gray Code 位元映射對應
     let stateMap = {};
-    const gray2 = [[0,0], [0,1], [1,1], [1,0]];
+    const grayMap = [[0,0], [0,1], [1,1], [1,0]]; // 真 Gray Code 排列
     sortedStates.forEach((s, idx) => {
         if(ffCount === 1 && idx < 2) stateMap[s] = [idx % 2];
         else if(ffCount === 2 && idx < 4) {
-            if (encoding === 'gray') stateMap[s] = gray2[idx];
+            if (encoding === 'gray') stateMap[s] = grayMap[idx];
             else stateMap[s] = [Math.floor(idx/2), idx%2]; 
         }
     });
@@ -1111,7 +1216,7 @@ function drawDynamicCircuit(eq1A, eq1B, eq0A, eq0B, eqZ, inVar, isSinglePin, l1A
 }
 
 // ================================================================
-// 狀態轉移圖 (自適應字體大小 + 完美視角)
+// 狀態轉移圖
 // ================================================================
 function drawStateDiagram() {
     const svg = document.getElementById('state-diagram-svg');
@@ -1225,7 +1330,6 @@ function drawStateDiagram() {
 
     states.forEach((s, idx) => {
         const c = coords[s];
-        // 如果不是 A,B,C,D，自動給其他顏色
         const palette = ["#d9534f", "#5bc0de", "#5cb85c", "#f0ad4e", "#8e44ad", "#e67e22"];
         let col = colors[s] || palette[idx % palette.length];
         
@@ -1233,7 +1337,6 @@ function drawStateDiagram() {
 
         html += `<circle id="node-${safeId(s)}" cx="${c.x}" cy="${c.y}" r="${r}" fill="var(--bg-panel)" stroke="${col}" stroke-width="3.5"/>`;
         
-        // 🔥 自動縮放超長狀態名稱
         if (isMoore) {
             let fSize = 16;
             if (s.length > 4) fSize = 9;
@@ -1256,7 +1359,7 @@ function drawStateDiagram() {
 }
 
 // ================================================================
-// 動態跑馬燈模擬器 & 數位波形分析儀 (Waveform Viewer)
+// 動態跑馬燈模擬器與數位波形分析儀 
 // ================================================================
 let simInterval = null;
 let waveHistory = []; 
@@ -1269,6 +1372,7 @@ function stopSimulation() {
     document.querySelectorAll('.active-step').forEach(el => el.classList.remove('active-step'));
 }
 
+// 修正 3: 波形圖寬度先 Block 再繪製
 function startSimulation() {
     stopSimulation();
     waveHistory = []; 
@@ -1368,8 +1472,11 @@ function startSimulation() {
         i++;
     }
 
-    stepForward(); 
-    simInterval = setInterval(stepForward, 800); 
+    // 讓 DOM 延遲一幀渲染，以確保 svg 的 clientWidth 不是 0
+    setTimeout(() => {
+        stepForward(); 
+        simInterval = setInterval(stepForward, 800); 
+    }, 50);
 }
 
 function drawWaveform(history, ffCount) {
@@ -1485,7 +1592,6 @@ function exportVerilog() {
     vCode += `    output ${outVar}\n`;
     vCode += `);\n\n`;
 
-    // 🔥 加上專業的 localparam 狀態宣告
     if (Object.keys(stateMapGlobal).length > 0) {
         vCode += `    // State Encodings\n`;
         for (let s in stateMapGlobal) {
