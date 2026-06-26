@@ -43,7 +43,8 @@
         .app-wrapper { display: flex; height: 100vh; width: 100vw; position: relative; }
         .control-panel {
             width: 45%; height: 100%; overflow-y: auto; padding: 20px;
-            box-sizing: border-box; background: var(--bg-body);
+            box-sizing: border-box; border-right: 1px solid var(--border-color);
+            background: var(--bg-body);
             transition: background-color 0.3s ease;
         }
         .visual-panel {
@@ -53,11 +54,11 @@
             transition: background-color 0.3s ease;
         }
         
-        /* 左右拖曳分隔線樣式 */
+        /* 🔥 左右拖曳分隔線樣式 */
         .splitter {
-            width: 6px;
+            width: 8px;
             height: 100%;
-            background: var(--border-color);
+            background: transparent;
             cursor: col-resize;
             transition: background 0.2s;
             position: relative;
@@ -89,6 +90,7 @@
         table.data-table th, table.data-table td { border: 1px solid var(--border-color); padding: 6px; }
         table.data-table th { background: rgba(0,0,0,0.02); font-weight: 700; }
         
+        /* 🔥 自訂狀態名稱可編輯樣式 */
         .editable-cell {
             cursor: text; font-weight: 800; color: var(--primary);
             text-transform: uppercase; transition: all 0.2s ease;
@@ -149,7 +151,7 @@
         .canvas-container { flex: 1.5; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 500px; }
         .state-diagram-container { flex: 1; position: relative; display: flex; flex-direction: column; min-height: 300px; max-height: 350px;}
 
-        /* 新手導覽彈窗 (Welcome Overlay) */
+        /* 新手導覽彈窗 */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
@@ -167,7 +169,6 @@
         .tour-step { background: var(--bg-body); padding: 10px; border-radius: 8px; margin-bottom: 10px; text-align: left; font-size: 14px; font-weight: 600; border-left: 4px solid var(--accent-blue);}
         .tour-btn { background: var(--primary); color: white; border: none; padding: 10px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; margin-top: 15px;}
         .tour-btn:hover { background: #003d66; transform: scale(1.05); }
-        .hidden { opacity: 0; pointer-events: none; transform: translateY(-20px); }
 
         /* Toast 提示通知 */
         #toast-container {
@@ -427,10 +428,8 @@
 
 <script>
 // ================================================================
-// UI 與 導覽操作
+// UI 與導覽操作
 // ================================================================
-
-// 修正 8: 歡迎導覽記憶機制
 if (localStorage.getItem('hideTour') === 'true') {
     document.getElementById('welcome-overlay').style.display = 'none';
 }
@@ -452,7 +451,7 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2500);
 }
 
-// 修正 2: 左右拖曳分隔線核心綁定
+// 左右拖曳分隔線核心綁定
 window.addEventListener('DOMContentLoaded', () => {
     const splitter = document.getElementById('drag-splitter');
     const leftPanel = document.getElementById('left-panel');
@@ -522,7 +521,6 @@ function resetHighlight() {
     });
 }
 
-// 修正 10: 深色模式切換全面更新 SVG
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -556,95 +554,124 @@ document.getElementById('output-var').addEventListener('input', debounceUpdate);
 // ================================================================
 // 狀態表操作
 // ================================================================
+
+// 修正重點：讓資料讀取邏輯完全無懼 Moore 的 rowspan
 function getTableData() {
     const rows = document.querySelectorAll('#state-table tbody tr');
     const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
     let data = [];
+    let lastPS = '';
     let lastZ = '0'; 
     
     rows.forEach((row) => {
-        let cells = row.getElementsByTagName('td');
-        if (cells.length < 3) return;
-        
-        let ps = cells[0].innerText.trim().toUpperCase();
-        let x  = cells[1].innerText.trim();
-        let nsSelect = cells[2].querySelector('.ns-select');
+        let psCell = row.querySelector('.ps-cell');
+        let ps = psCell ? psCell.innerText.trim().toUpperCase() : lastPS;
+        lastPS = ps; // 若被 rowspan 吃掉，就沿用上一行的 PS
+
+        let xCell = row.querySelector('.x-cell');
+        let x = xCell ? xCell.innerText.trim() : '0';
+
+        let nsSelect = row.querySelector('.ns-select');
         let ns = nsSelect ? nsSelect.value : ps;
         
-        let zSelect = cells.length >= 4 ? cells[cells.length-1].querySelector('.z-select') : null;
-        let z;
-        if (zSelect) {
-            z = zSelect.value;
-            lastZ = z; 
-        } else {
-            z = isMoore ? lastZ : '0'; 
-        }
+        let zSelect = row.querySelector('.z-select');
+        if (zSelect) { lastZ = zSelect.value; }
+        
+        let z = isMoore ? lastZ : (zSelect ? zSelect.value : '0');
+        
         data.push({ps, x, ns, z});
     });
+
+    // 從資料層面徹底強迫 Moore 模式的輸出 Z 值對齊
+    if (isMoore) {
+        let zMap = {};
+        data.forEach(d => { if (zMap[d.ps] === undefined) zMap[d.ps] = d.z; });
+        data.forEach(d => { d.z = zMap[d.ps]; });
+    }
+    
     return data;
 }
 
-// 修正 6: Moore RowSpan 動態計算
+// 修正重點：群組化繪製表格，再也不會錯位
 function renderTableHTML(data) {
     const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
     const tbody = document.querySelector('#state-table tbody');
     const thOut = document.getElementById('th-out');
     const outVar = document.getElementById('output-var').value || 'Z';
     thOut.innerHTML = isMoore 
-        ? `<span class="dyn-out">${outVar}</span><br><span style="font-size:0.7em;color:var(--text-muted);">(State Only)</span>`
+        ? `<span class="dyn-out">${outVar}</span><br><span style="font-size:0.7em;color:var(--text-muted);">(State)</span>`
         : `<span class="dyn-out">${outVar}</span>`;
 
     let uniqueStates = Array.from(new Set(data.map(d => d.ps))).filter(s => s !== "");
+
     let html = '';
+    if (isMoore) {
+        let currentPS = null;
+        let rowspanCount = 0;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].ps !== currentPS) {
+                currentPS = data[i].ps;
+                rowspanCount = 1;
+                for (let j = i + 1; j < data.length; j++) {
+                    if (data[j].ps === currentPS) rowspanCount++;
+                    else break;
+                }
 
-    for(let i = 0; i < data.length; i++) {
-        let nsSelect = `<select class="table-select ns-select" onchange="debounceUpdate()">`;
-        uniqueStates.forEach(s => {
-            nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`;
-        });
-        nsSelect += `</select>`;
+                let nsSelect = `<select class="table-select ns-select" onchange="debounceUpdate()">`;
+                uniqueStates.forEach(s => { nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`; });
+                nsSelect += `</select>`;
 
-        let zSelect = `<select class="table-select z-select" onchange="debounceUpdate()">
-            <option value="0" ${data[i].z === '0' ? 'selected' : ''}>0</option>
-            <option value="1" ${data[i].z === '1' ? 'selected' : ''}>1</option>
-        </select>`;
+                let zSelect = `<select class="table-select z-select" onchange="debounceUpdate()">
+                    <option value="0" ${data[i].z === '0' ? 'selected' : ''}>0</option>
+                    <option value="1" ${data[i].z === '1' ? 'selected' : ''}>1</option>
+                </select>`;
 
-        // 計算目前群組的連續筆數，保護 Moore 模式即使手動亂改名稱也能維持表格結構
-        let isFirstOfGroup = (i === 0 || data[i].ps !== data[i-1].ps);
-        let rowSpanCount = 1;
-        if (isFirstOfGroup && isMoore) {
-            for(let j = i + 1; j < data.length; j++) {
-                if (data[j].ps === data[i].ps) rowSpanCount++;
-                else break;
+                html += `<tr>`;
+                html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false" rowspan="${rowspanCount}">${data[i].ps}</td>`;
+                html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);">${data[i].x}</td>`;
+                html += `<td>${nsSelect}</td>`;
+                html += `<td rowspan="${rowspanCount}" style="vertical-align:middle;">${zSelect}</td>`;
+                html += `</tr>`;
+            } else {
+                let nsSelect = `<select class="table-select ns-select" onchange="debounceUpdate()">`;
+                uniqueStates.forEach(s => { nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`; });
+                nsSelect += `</select>`;
+
+                html += `<tr>`;
+                html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);">${data[i].x}</td>`;
+                html += `<td>${nsSelect}</td>`;
+                html += `</tr>`;
             }
         }
+    } else {
+        for (let i = 0; i < data.length; i++) {
+            let nsSelect = `<select class="table-select ns-select" onchange="debounceUpdate()">`;
+            uniqueStates.forEach(s => { nsSelect += `<option value="${s}" ${data[i].ns === s ? 'selected' : ''}>${s}</option>`; });
+            nsSelect += `</select>`;
 
-        html += `<tr>`;
-        if (isMoore) {
-            if (isFirstOfGroup) {
-                html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱" rowspan="${rowSpanCount}">${data[i].ps}</td>`;
-            }
-            html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);" title="輸入 0 或 1">${data[i].x}</td>`;
-            html += `<td>${nsSelect}</td>`;
-            if (isFirstOfGroup) {
-                html += `<td rowspan="${rowSpanCount}" style="vertical-align:middle;">${zSelect}</td>`;
-            }
-        } else {
-            html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false" title="點擊修改狀態名稱">${data[i].ps}</td>`;
-            html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);" title="輸入 0 或 1">${data[i].x}</td>`;
+            let zSelect = `<select class="table-select z-select" onchange="debounceUpdate()">
+                <option value="0" ${data[i].z === '0' ? 'selected' : ''}>0</option>
+                <option value="1" ${data[i].z === '1' ? 'selected' : ''}>1</option>
+            </select>`;
+
+            html += `<tr>`;
+            html += `<td class="editable-cell ps-cell" contenteditable="true" spellcheck="false">${data[i].ps}</td>`;
+            html += `<td class="editable-cell x-cell" contenteditable="true" style="color:var(--accent-red);">${data[i].x}</td>`;
             html += `<td>${nsSelect}</td>`;
             html += `<td>${zSelect}</td>`;
+            html += `</tr>`;
         }
-        html += `</tr>`;
     }
+
     tbody.innerHTML = html;
 
-    // 修正 4: 輸入防呆保護機制 (Validation)
+    // 重新綁定事件：防呆驗證 + 保護輸入游標
     document.querySelectorAll('.ps-cell').forEach(cell => {
         cell.addEventListener('blur', (e) => { 
             let clean = e.target.innerText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            if(!clean) clean = 'A'; // 防呆：如果刪光了，塞個A給它
             if(e.target.innerText !== clean) {
-                showToast('⚠️ 狀態名稱已移除非法字元');
+                showToast('⚠️ 狀態名稱已自動修正');
                 e.target.innerText = clean;
             }
             debounceUpdate(); 
@@ -656,7 +683,7 @@ function renderTableHTML(data) {
         cell.addEventListener('blur', (e) => {
             let val = e.target.innerText.trim();
             if(val !== '0' && val !== '1' && val !== 'X') {
-                showToast('⚠️ 輸入值只能是 0 或 1，已為您重置');
+                showToast('⚠️ 輸入值只能是 0 或 1');
                 e.target.innerText = '0';
             }
             debounceUpdate();
@@ -701,32 +728,6 @@ function loadPresetMoore() {
     debounceUpdate();
 }
 
-function enforceMooreSync() {
-    const isMoore = document.querySelector('input[name="model"]:checked').value === 'moore';
-    if (!isMoore) return;
-    const rows = document.querySelectorAll('#state-table tbody tr');
-    let zMap = {};
-    rows.forEach(row => {
-        let cells = row.getElementsByTagName('td');
-        if (cells.length < 3) return; // 保護機制
-        let ps = cells[0].innerText.trim().toUpperCase();
-        if (ps === "") return;
-        
-        let zSelect = null;
-        if(cells.length === 4) zSelect = cells[3].querySelector('select'); // Mealy 或 Moore 首行
-        else if(cells.length === 3) zSelect = null; // Moore 的次行沒有 Z 選單
-        
-        if (!zSelect) return;
-        let val = zSelect.value;
-        if (zMap[ps] === undefined) zMap[ps] = val;
-        else if (zMap[ps] !== val) {
-            zSelect.value = zMap[ps];
-            cells[cells.length-1].classList.add('sync-flash');
-            setTimeout(() => cells[cells.length-1].classList.remove('sync-flash'), 500);
-        }
-    });
-}
-
 function clearTable() {
     let data = getTableData();
     data.forEach(d => { d.ns = d.ps; d.z = '0'; });
@@ -753,8 +754,11 @@ function updateDynamicDropdowns() {
     const rows = document.querySelectorAll('#state-table tbody tr');
     let uniqueStates = new Set();
     rows.forEach(row => {
-        let ps = row.cells[0].innerText.trim().toUpperCase();
-        if (ps) uniqueStates.add(ps);
+        let psCell = row.querySelector('.ps-cell');
+        if (psCell) {
+            let ps = psCell.innerText.trim().toUpperCase();
+            if (ps) uniqueStates.add(ps);
+        }
     });
     let stateArray = Array.from(uniqueStates).sort();
     if (stateArray.length > 4) stateArray = stateArray.slice(0, 4);
@@ -774,7 +778,6 @@ function updateDynamicDropdowns() {
 }
 
 function triggerUpdate() {
-    enforceMooreSync();
     updateDynamicDropdowns(); 
     document.getElementById('dynamic-routing-layer').innerHTML = '';
     setTimeout(() => {
@@ -789,7 +792,7 @@ document.querySelectorAll('input[name="ff_type"], input[name="encoding"]').forEa
 document.querySelectorAll('input[name="row_count"]').forEach(el => el.addEventListener('change', updateRowCount));
 
 // ================================================================
-// 原汁原味保留的 Q-M 演算法與正反器邏輯
+// Q-M 演算法與正反器邏輯
 // ================================================================
 function getFFInputs(q, nq, type) {
     let curr = Number(q);
@@ -966,7 +969,6 @@ function runLogicSynthesis() {
         if (d.ns) uniqueStates.add(d.ns.toUpperCase());
     });
     
-    // 修正 5: 超過四個狀態加入提醒
     let sortedStates = Array.from(uniqueStates).filter(s => s !== "").sort();
     if (sortedStates.length > 4) {
         showToast("⚠️ 警告：輸入狀態數量超過 4 個，系統僅能正確編碼前四個狀態！");
@@ -976,9 +978,8 @@ function runLogicSynthesis() {
     let ffCount = sortedStates.length <= 2 ? 1 : 2;
     currentNumVars = ffCount + 1;
 
-    // 修正 1: Gray Code 位元映射對應
     let stateMap = {};
-    const grayMap = [[0,0], [0,1], [1,1], [1,0]]; // 真 Gray Code 排列
+    const grayMap = [[0,0], [0,1], [1,1], [1,0]]; 
     sortedStates.forEach((s, idx) => {
         if(ffCount === 1 && idx < 2) stateMap[s] = [idx % 2];
         else if(ffCount === 2 && idx < 4) {
@@ -1032,16 +1033,6 @@ function runLogicSynthesis() {
     let IN0_B = new Array(size).fill('X');
     let Z     = new Array(size).fill('X');
 
-    let mooreZMap = {};
-    if (isMoore) {
-        tableData.forEach(d => {
-            let ps = d.ps.toUpperCase();
-            if (ps && stateMap[ps] !== undefined) {
-                mooreZMap[ps] = d.z;
-            }
-        });
-    }
-
     for(let i=0; i<tableData.length; i++) {
         let ps = tableData[i].ps ? tableData[i].ps.toUpperCase() : '';
         let ns = tableData[i].ns ? tableData[i].ns.toUpperCase() : '';
@@ -1065,22 +1056,8 @@ function runLogicSynthesis() {
             IN0_A[idx] = ff0[0]; IN0_B[idx] = ff0[1] !== null ? ff0[1] : 'X';
         }
         
-        if (!isMoore) {
-            let zval = tableData[i].z;
-            Z[idx] = (zval === '1' || zval === '0') ? zval : 'X';
-        }
-    }
-
-    if (isMoore) {
-        sortedStates.forEach(s => {
-            if (!stateMap[s]) return;
-            let zVal = mooreZMap[s] || '0';
-            let q_ps = stateMap[s];
-            for (let x = 0; x < 2; x++) {
-                let idx = ffCount === 1 ? ((q_ps[0]<<1) | x) : ((q_ps[0]<<2) | (q_ps[1]<<1) | x);
-                if (idx >= 0 && idx < size) Z[idx] = zVal;
-            }
-        });
+        let zval = tableData[i].z;
+        Z[idx] = (zval === '1' || zval === '0') ? zval : 'X';
     }
 
     let eq1A = ffCount === 1 ? '' : minimizeLogicExact(IN1_A, currentInVar, currentNumVars);
@@ -1260,10 +1237,12 @@ function drawStateDiagram() {
     });
 
     const r = 32; 
+    const isDark = document.body.classList.contains('dark-mode');
+    const markerColor = isDark ? '#adb5bd' : '#666666';
 
     let html = `<defs>
         <marker id="arrow" viewBox="0 -5 10 10" refX="9" refY="0" markerWidth="8" markerHeight="8" orient="auto">
-            <path d="M0,-4 L10,0 L0,4 z" fill="var(--text-muted)"/>
+            <path d="M0,-4 L10,0 L0,4 z" fill="${markerColor}"/>
         </marker>
     </defs>`;
 
@@ -1359,7 +1338,7 @@ function drawStateDiagram() {
 }
 
 // ================================================================
-// 動態跑馬燈模擬器與數位波形分析儀 
+// 動態跑馬燈模擬器與波形分析儀
 // ================================================================
 let simInterval = null;
 let waveHistory = []; 
@@ -1372,7 +1351,6 @@ function stopSimulation() {
     document.querySelectorAll('.active-step').forEach(el => el.classList.remove('active-step'));
 }
 
-// 修正 3: 波形圖寬度先 Block 再繪製
 function startSimulation() {
     stopSimulation();
     waveHistory = []; 
@@ -1472,7 +1450,6 @@ function startSimulation() {
         i++;
     }
 
-    // 讓 DOM 延遲一幀渲染，以確保 svg 的 clientWidth 不是 0
     setTimeout(() => {
         stepForward(); 
         simInterval = setInterval(stepForward, 800); 
